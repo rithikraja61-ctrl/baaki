@@ -24,7 +24,7 @@ public class CustomerService {
     public record CustomerView(Long id, String name, String contactPerson, String phone, String email, String address,
                                String city, String stateCode, String stateName, String gstin, boolean registered,
                                int creditDays, long owedPaise, long overduePaise, int openInvoices,
-                               ReliabilityCalculator.Stats reliability) {}
+                               ReliabilityCalculator.Stats reliability, String preferredLanguage) {}
 
     public static Map<Long, ReliabilityCalculator.Stats> reliability(Snapshot s) {
         Map<Long, List<Integer>> late = new HashMap<>();
@@ -68,7 +68,7 @@ public class CustomerService {
             if (s.today.isAfter(i.dueDate)) overdue += s.outstanding(i);
         }
         return new CustomerView(c.id, c.name, c.contactPerson, c.phone, c.email, c.address, c.city, c.stateCode,
-                IndianStates.name(c.stateCode), c.gstin, c.gstin != null, c.creditDays, owed, overdue, open, st);
+                IndianStates.name(c.stateCode), c.gstin, c.gstin != null, c.creditDays, owed, overdue, open, st, com.baaki.domain.Languages.orEnglish(c.preferredLanguage));
     }
 
     /** One past payment: what was due, when it came in, and how late. */
@@ -96,7 +96,7 @@ public class CustomerService {
     }
 
     public record CustomerReq(String name, String contactPerson, String phone, String email, String address,
-                              String city, String stateCode, String gstin, Integer creditDays) {}
+                              String city, String stateCode, String gstin, Integer creditDays, String preferredLanguage) {}
 
     @Transactional
     public CustomerView save(Long id, CustomerReq r) {
@@ -106,6 +106,9 @@ public class CustomerService {
         c.contactPerson = r.contactPerson(); c.phone = r.phone(); c.email = r.email();
         c.address = r.address(); c.city = r.city();
         c.creditDays = r.creditDays() == null ? 30 : r.creditDays();
+        if (r.preferredLanguage() != null && !com.baaki.domain.Languages.ALL.contains(r.preferredLanguage()))
+            throw new IllegalArgumentException("Unsupported language");
+        c.preferredLanguage = com.baaki.domain.Languages.orEnglish(r.preferredLanguage() == null ? c.preferredLanguage : r.preferredLanguage());
         if (c.creditDays < 0 || c.creditDays > 365) throw new IllegalArgumentException("Credit days must be between 0 and 365");
         String g = r.gstin() == null ? "" : r.gstin().trim().toUpperCase();
         if (!g.isEmpty()) {
