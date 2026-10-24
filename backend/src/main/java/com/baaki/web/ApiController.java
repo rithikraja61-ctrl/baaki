@@ -70,6 +70,7 @@ public class ApiController {
     // ----- customers -----
     @GetMapping("/customers") public List<CustomerService.CustomerView> customers() { return customers.list(); }
     @GetMapping("/customers/{id}") public CustomerService.CustomerView customer(@PathVariable Long id) { return customers.get(id); }
+    @GetMapping("/customers/{id}/payments") public List<CustomerService.PaymentRecord> customerPayments(@PathVariable Long id) { return customers.paymentRecord(id); }
     @PostMapping("/customers") public CustomerService.CustomerView addCustomer(@RequestBody CustomerService.CustomerReq r) { return customers.save(null, r); }
     @PutMapping("/customers/{id}") public CustomerService.CustomerView editCustomer(@PathVariable Long id, @RequestBody CustomerService.CustomerReq r) { return customers.save(id, r); }
 
