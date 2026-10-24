@@ -72,7 +72,7 @@ export default function Settings() {
         <ul className="space-y-2">
           {lad.map((s, i) => (
             <li key={s.code} className="flex flex-wrap items-center gap-3">
-              <span className="w-48 font-semibold">{t('fu.stage.' + s.code)}</span>
+              <span className="w-full sm:w-48 font-semibold">{t('fu.stage.' + s.code)}</span>
               <label className="sr-only" htmlFor={`lo${i}`}>{t('set.offset')}</label>
               <input id={`lo${i}`} type="number" className="input w-28" value={s.offsetDays} onChange={(e) => setLad(lad.map((x, j) => (j === i ? { ...x, offsetDays: Number(e.target.value) } : x)))} />
               <label className="flex items-center gap-2 min-h-[48px]"><input type="checkbox" className="w-6 h-6" checked={s.enabled} onChange={(e) => setLad(lad.map((x, j) => (j === i ? { ...x, enabled: e.target.checked } : x)))} />{t('set.enabled')}</label>
