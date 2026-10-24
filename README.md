@@ -15,6 +15,14 @@ docker compose up -d --build     # MySQL + API + app
 - The backend image compiles with Java 21 and runs the JUnit tests during `docker compose build backend`.
 - Flyway creates the schema and sample data on first start.
 
+## Languages (English, हिंदी, मराठी)
+
+- The whole app is in English, Hindi and Marathi (`frontend/src/i18n/en.js`, `hi.js`, `mr.js`). Pick a language in the header or in Settings; each name is shown in its own script. GST, GSTIN, HSN/SAC, UPI and IFSC stay as they are.
+- Each customer has a **language for reminders and pay link** (Customers → Edit). Automatic emails, the WhatsApp/SMS/email text on Today's follow-ups, the pay page and the public invoice page use it. The customer can switch on the pay page; `?lang=mr` in a link also works.
+- Reminder wording for all three languages is in `reminder-templates.json` (keep the frontend and backend copies identical).
+- Invoices and Payment Demand Letters stay in English. In Settings → Language and text, pick **Second language on invoices and letters** to print Hindi or Marathi in small text under each heading.
+- Sample data: Patil, Gaikwad, Shinde, Pawar and Rane prefer Marathi; Jadhav prefers Hindi (migration `V4__languages.sql`).
+
 ## Money rules
 - All money is `BIGINT` paise. GST is per line on taxable value, CGST/SGST rounded separately, grand total rounded to the rupee with a Round off line.
 - Invoice numbers `INV/26-27/0001` come from `invoice_sequence` read with `SELECT ... FOR UPDATE`, per financial year (1 Apr–31 Mar).
