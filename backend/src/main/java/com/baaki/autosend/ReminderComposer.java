@@ -35,7 +35,7 @@ public final class ReminderComposer {
     public static Email compose(ReminderTemplates.Lang l, String lang, BusinessProfile p, FollowUp f, String baseUrl,
                                 String testRealRecipient) {
         String base = blank(baseUrl) ? "" : (baseUrl.endsWith("/") ? baseUrl.substring(0, baseUrl.length() - 1) : baseUrl);
-        Locale loc = Locale.forLanguageTag("hi".equals(lang) ? "hi-IN" : "en-IN");
+        Locale loc = Locale.forLanguageTag(switch (lang == null ? "en" : lang) { case "hi" -> "hi-IN"; case "mr" -> "mr-IN"; default -> "en-IN"; });
         DateTimeFormatter df = DateTimeFormatter.ofPattern("d MMM yyyy", loc);
         String numbers = f.invoices().stream().map(FollowUpInvoice::invoiceNumber).collect(Collectors.joining(", "));
         String payLinks = f.invoices().stream().map(i -> base + "/pay/" + i.payToken()).collect(Collectors.joining(" "));
