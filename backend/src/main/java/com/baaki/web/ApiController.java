@@ -7,6 +7,8 @@ import com.baaki.money.GstinValidator;
 import com.baaki.money.IndianNumberWords;
 import com.baaki.money.IndianStates;
 import com.baaki.service.*;
+import com.baaki.autosend.AutoSendService;
+import com.baaki.autosend.SendLog;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,13 +27,15 @@ public class ApiController {
     private final InboxService inbox;
     private final LetterService letters;
     private final SettingsService settings;
+    private final AutoSendService autoSend;
 
     public ApiController(DashboardService dashboard, InvoiceService invoices, CustomerService customers,
                          LadderService ladder, ChaseService chase, ForecastService forecast, PaymentService payments,
-                         InboxService inbox, LetterService letters, SettingsService settings) {
+                         InboxService inbox, LetterService letters, SettingsService settings,
+                         AutoSendService autoSend) {
         this.dashboard = dashboard; this.invoices = invoices; this.customers = customers; this.ladder = ladder;
         this.chase = chase; this.forecast = forecast; this.payments = payments; this.inbox = inbox;
-        this.letters = letters; this.settings = settings;
+        this.letters = letters; this.settings = settings; this.autoSend = autoSend;
     }
 
     // ----- config & settings -----
@@ -93,6 +97,13 @@ public class ApiController {
     public record MarkSentReq(List<Long> invoiceIds, String stage, String channel, String message) {}
     @PostMapping("/followups/mark-sent")
     public Map<String, Object> markSent(@RequestBody MarkSentReq r) { ladder.markSent(r.invoiceIds(), r.stage(), r.channel(), r.message()); return Map.of("ok", true); }
+
+    // ----- automatic email reminders -----
+    @GetMapping("/autosend/status") public AutoSendService.Status autoSendStatus() { return autoSend.status(); }
+    @GetMapping("/autosend/log") public List<SendLog> autoSendLog() { return autoSend.recent(); }
+    @PostMapping("/autosend/run") public AutoSendService.RunResult autoSendRun() { return autoSend.run("RUN_NOW"); }
+    @PostMapping("/autosend/{id}/retry") public SendLog autoSendRetry(@PathVariable Long id) { return autoSend.retry(id); }
+    @PutMapping("/settings/autosend") public AutoSendService.Status autoSendSettings(@RequestBody AutoSendService.SettingsReq r) { return autoSend.saveSettings(r); }
 
     @GetMapping("/chase") public List<ChaseService.ChaseItem> chase() { return chase.list(); }
 
