@@ -185,7 +185,7 @@ export default function NewInvoice() {
             </div>
           </div>
         )}
-        {adding && <div className="border rounded-lg p-3 mt-3"><CustomerForm initial={scan && !scan.matchedCustomerId ? { name: scan.customerName || '', contactPerson: '', phone: '', email: '', address: scan.customerAddress || '', city: '', stateCode: scan.placeOfSupply || '27', gstin: scan.customerGstinValid ? scan.customerGstin : '', creditDays: 30 } : undefined} onSaved={(c) => { custs.reload(); touch('customer'); setCustomerId(String(c.id)); setAdding(false); }} onCancel={() => setAdding(false)} /></div>}
+        {adding && <div className="border rounded-lg p-3 mt-3"><CustomerForm initial={scan && !scan.matchedCustomerId ? { name: scan.customerName || '', contactPerson: '', phone: '', email: '', address: scan.customerAddress || '', city: '', stateCode: scan.placeOfSupply || '27', gstin: scan.customerGstinValid ? scan.customerGstin : '', creditDays: 30, preferredLanguage: 'en' } : undefined} onSaved={(c) => { custs.reload(); touch('customer'); setCustomerId(String(c.id)); setAdding(false); }} onCancel={() => setAdding(false)} /></div>}
         {customer && <p className="mt-2 muted">{customer.gstin ? `GSTIN ${customer.gstin} · ` : `${t('cust.unregistered')} · `}{customer.stateName} ({customer.stateCode}) · {t('cust.creditDays')}: {customer.creditDays}</p>}
         <div className="grid sm:grid-cols-2 gap-3 mt-3">
           <div>
