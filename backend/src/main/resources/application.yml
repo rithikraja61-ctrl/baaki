@@ -27,3 +27,11 @@ baaki:
   msme-max-days: 45
   e-invoice-threshold-paise: 5000000000   # Rs 5 crore
   hsn-six-digit-threshold-paise: 5000000000
+  # Automatic email reminders. Secrets come from environment variables (see .env.example), never from this file.
+  mail:
+    provider: ${MAIL_PROVIDER:none}          # resend | smtp | none
+    from-address: ${MAIL_FROM:}              # e.g. reminders@yourdomain.in (must be verified with the provider)
+    resend-api-key: ${RESEND_API_KEY:}
+    public-base-url: ${PUBLIC_BASE_URL:http://localhost:5190}   # used to build invoice and pay links
+  auto-send:
+    cron: "0 0 10 * * *"                     # every day at 10:00, zone Asia/Kolkata
