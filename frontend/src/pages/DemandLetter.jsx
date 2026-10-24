@@ -72,7 +72,7 @@ export default function DemandLetter() {
           </table></div>
           {L.msmeEligible && (
             <div className="mt-3 text-sm">
-              <p>{L.msmeLine}</p>
+              <p>{t('letter.msmeLine')}</p>
               <p className="mt-1">{t('letter.interest')}: <strong>{money(L.interestPaise)}</strong>{!L.includeInterest && ` ${t('letter.notIncluded')}`}</p>
               <p className="text-xs">{t('letter.interestNote', { rate: L.interestRatePercent, bank: L.bankRatePercent })}</p>
             </div>
