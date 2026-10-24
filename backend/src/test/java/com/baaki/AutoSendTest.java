@@ -25,7 +25,7 @@ class AutoSendTest {
     static FollowUp fu(long customer, String stage, String email) {
         FollowUpInvoice i = new FollowUpInvoice(customer * 10, "INV/26-27/00" + customer, LocalDate.of(2026, 9, 1),
                 LocalDate.of(2026, 10, 24), 1180000, 0, "tok" + customer);
-        return new FollowUp(customer, "Customer " + customer, "Contact", "+91 90000 00000", email, stage, 0, 1180000, 0, List.of(i));
+        return new FollowUp(customer, "Customer " + customer, "Contact", "+91 90000 00000", email, stage, 0, 1180000, 0, List.of(i), "en");
     }
 
     static String skip(List<AutoSendRules.Decision> plan, long customer, String stage) {
@@ -76,5 +76,20 @@ class AutoSendTest {
         assertFalse(e.text().toLowerCase().contains("legal notice"));
         var test = ReminderComposer.compose(l, "en", p, fu(1, "DUE_TODAY", "a@x.in"), "https://baaki.example", "a@x.in");
         assertTrue(test.text().startsWith("TEST MODE"));
+    }
+
+    @Test
+    void marathiReminderUsesCustomerLanguageAndKeepsLinks() {
+        BusinessProfile p = new BusinessProfile();
+        p.name = "Sharma Packaging"; p.ownerName = "Rakesh Sharma"; p.phone = "+91 98900 12345"; p.ownerEmail = "rakesh@sp.example";
+        var templates = new ReminderTemplates();
+        for (String lang : new String[]{"en", "hi", "mr"})
+            for (String stage : new String[]{"HEADS_UP", "DUE_TODAY", "FIRM", "FINAL", "DEMAND_LETTER", "NEXT_STEPS"})
+                assertFalse(templates.get(lang).stages().getOrDefault(stage, "").isBlank(), lang + " " + stage);
+        var e = ReminderComposer.compose(templates.get("mr"), "mr", p, fu(1, "HEADS_UP", "a@x.in"), "https://baaki.example", null);
+        assertTrue(e.subject().contains("आठवण"));
+        assertTrue(e.text().contains("https://baaki.example/pay/tok1"));
+        assertTrue(e.text().trim().endsWith("संपर्क करा: +91 98900 12345, rakesh@sp.example."));
+        assertTrue(e.text().contains("INV/26-27/001"));
     }
 }
