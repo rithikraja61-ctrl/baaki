@@ -3,6 +3,12 @@ import { api } from '../api/client.js';
 import { useApp, useLoad } from '../lib/AppContext.jsx';
 import { fmtDate, money, paiseToInput, toPaise } from '../lib/format.js';
 import { ErrorBox, Loading, Notice, PageTitle } from '../components/ui.jsx';
+
+export function reasonText(t, r) {
+  const v = {};
+  for (const [k, x] of Object.entries(r.v || {})) v[k] = k.endsWith('Paise') ? money(x) : x;
+  return t('pmt.reason.' + r.code, v);
+}
 import sampleCsv from '../data/bank-statement.csv?raw';
 
 function Pending({ p, invoices, onDone }) {
@@ -13,15 +19,16 @@ function Pending({ p, invoices, onDone }) {
   const total = rows.reduce((x, r) => x + (toPaise(r.amount) || 0), 0);
   const left = p.amountPaise - total;
   const go = async (fn) => { setErr(null); try { await fn(); onDone(); } catch (e) { setErr(e); } };
-  const tone = { EXACT: 'border-green-600', MULTIPLE: 'border-green-600', PART: 'border-amber-500', TDS: 'border-amber-500', OVERPAID: 'border-purple-500', UNMATCHED: 'border-red-600' }[s.kind];
+  const tone = { EXACT: 'border-green-600', MULTIPLE: 'border-green-600', PART: 'border-amber-500', TDS: 'border-amber-500', OVERPAID: 'border-purple-500', DISPUTED: 'border-orange-500', UNMATCHED: 'border-red-600' }[s.kind];
   return (
     <li className={`card border-l-8 ${tone}`}>
       <div className="flex flex-wrap justify-between gap-2">
         <div><div className="font-bold text-lg">{money(p.amountPaise)}</div><div className="text-sm muted">{fmtDate(p.date, lang)} · {p.reference}</div><div className="break-words">{p.description}</div></div>
         <div className="text-right"><div className="font-semibold">{t('pmt.kind.' + s.kind)}</div><div className="text-sm">{t('pmt.confidence')}: {t('pmt.conf.' + s.confidence)}</div></div>
       </div>
-      <ul className="list-disc ml-6 mt-2 text-sm">{s.reasons.map((r, i) => <li key={i}>{r}</li>)}</ul>
-      {s.kind === 'TDS' && <Notice tone="warn">{t('pmt.tdsHint')} ({s.tdsPercent}%)</Notice>}
+      <ul className="list-disc ml-6 mt-2 text-sm">{s.reasons.map((r, i) => <li key={i}>{reasonText(t, r)}</li>)}</ul>
+      {(s.kind === 'TDS' || s.tdsPercent) && <Notice tone="warn">{t('pmt.tdsHint')} ({s.tdsPercent}%)</Notice>}
+      {s.kind === 'DISPUTED' && <Notice tone="warn">{t('pmt.disputedHint')}</Notice>}
       <ErrorBox error={err} />
       <div className="mt-3 space-y-2">
         {rows.map((r, i) => (
@@ -32,7 +39,7 @@ function Pending({ p, invoices, onDone }) {
                 {invoices.map((inv) => <option key={inv.id} value={inv.id}>{inv.invoiceNumber} · {inv.customerName} · {money(inv.outstandingPaise)}</option>)}
               </select></div>
             <div><label className="label text-sm" htmlFor={`m${p.id}-${i}`}>₹</label><input id={`m${p.id}-${i}`} inputMode="decimal" className="input w-36" value={r.amount} onChange={(e) => setRows(rows.map((x, j) => (j === i ? { ...x, amount: e.target.value } : x)))} /></div>
-            <button className="btn-danger" aria-label="Remove" onClick={() => setRows(rows.filter((_, j) => j !== i))}>✕</button>
+            <button className="btn-danger" aria-label={t('common.remove')} onClick={() => setRows(rows.filter((_, j) => j !== i))}>✕</button>
           </div>
         ))}
         <button className="underline min-h-[48px]" onClick={() => setRows([...rows, { invoiceId: '', amount: paiseToInput(Math.max(0, left)) }])}>+ {t('pmt.addLine')}</button>
@@ -43,7 +50,7 @@ function Pending({ p, invoices, onDone }) {
           allocations: rows.filter((r) => r.invoiceId).map((r) => ({ invoiceId: Number(r.invoiceId), amountPaise: toPaise(r.amount) })),
           note: s.kind === 'TDS' ? `TDS ${s.tdsPercent}% short: ${money(s.shortfallPaise)} — certificate requested` : null,
         }))}>✓ {t('pmt.confirm')}</button>
-        <button className="btn-secondary" onClick={() => go(() => api.post(`/payments/${p.id}/ignore`, { note: 'Not a customer payment' }))}>{t('pmt.ignore')}</button>
+        <button className="btn-secondary" onClick={() => go(() => api.post(`/payments/${p.id}/ignore`, { note: t('pmt.ignoreNote') }))}>{t('pmt.ignore')}</button>
       </div>
     </li>
   );
