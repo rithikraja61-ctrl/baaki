@@ -9,4 +9,6 @@ public class LadderStage {
     public int offsetDays;
     public int sortOrder;
     public boolean enabled;
+    /** Send this stage by email automatically in the daily 10:00 IST job. Never allowed for DEMAND_LETTER / NEXT_STEPS. */
+    public boolean autoSend;
 }
