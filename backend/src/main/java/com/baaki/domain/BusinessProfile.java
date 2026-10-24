@@ -32,6 +32,10 @@ public class BusinessProfile {
     public String language;
     public String textSize;
     @Column(columnDefinition = "MEDIUMTEXT") public String logoDataUrl;
+    /** Reply-to address on automatic emails, and the inbox that receives everything in test mode. */
+    public String ownerEmail;
+    public boolean autoSendEnabled;
+    public boolean autoSendTestMode;
 
     public LocalDate getDemoDate() { return demoDate; }
 }
