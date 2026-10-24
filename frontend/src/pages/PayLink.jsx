@@ -26,7 +26,7 @@ export default function PayLink() {
     <div className="max-w-xl mx-auto p-3 sm:p-6 space-y-4">
       <div className="flex justify-between items-center no-print">
         <h1 className="text-xl font-bold">{t('pay.title', { biz: b.name })}</h1>
-        <button className="btn-secondary" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}>{lang === 'en' ? 'हिंदी' : 'English'}</button>
+        <button className="btn-secondary" aria-label={t('common.switchLang')} onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}>{lang === 'en' ? 'हिंदी' : 'English'}</button>
       </div>
       <section className="card text-center">
         <div className="muted">{inv.invoiceNumber} · {d.customer.name}</div>
