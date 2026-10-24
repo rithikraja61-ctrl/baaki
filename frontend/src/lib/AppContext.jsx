@@ -2,16 +2,26 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { api } from '../api/client.js';
 import en from '../i18n/en.js';
 import hi from '../i18n/hi.js';
+import mr from '../i18n/mr.js';
 
 const Ctx = createContext(null);
-const DICTS = { en, hi };
+const DICTS = { en, hi, mr };
 
 function lookup(dict, key) {
   return key.split('.').reduce((o, k) => (o == null ? undefined : o[k]), dict);
 }
 
+/** Translate in a given language (falls back to English). Used where the page language differs from the app's, e.g. the customer pay page. */
+export function translate(lang, key, vars) {
+  let s = lookup(DICTS[lang] || en, key);
+  if (s === undefined) s = lookup(en, key);
+  if (s === undefined) return key;
+  if (vars && typeof s === 'string') for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, v);
+  return s;
+}
+
 export function AppProvider({ children }) {
-  const [lang, setLangState] = useState(() => localStorage.getItem('baaki.lang') || 'en');
+  const [lang, setLangState] = useState(() => { const l = localStorage.getItem('baaki.lang'); return DICTS[l] ? l : 'en'; });
   const [textSize, setTextSizeState] = useState(() => localStorage.getItem('baaki.textSize') || 'normal');
   const [config, setConfig] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -37,13 +47,7 @@ export function AppProvider({ children }) {
   const setLang = (l) => { localStorage.setItem('baaki.lang', l); setLangState(l); api.put('/settings/prefs', { language: l }).catch(() => {}); };
   const setTextSize = (s) => { localStorage.setItem('baaki.textSize', s); setTextSizeState(s); api.put('/settings/prefs', { textSize: s }).catch(() => {}); };
 
-  const t = useCallback((key, vars) => {
-    let s = lookup(DICTS[lang], key);
-    if (s === undefined) s = lookup(en, key);
-    if (s === undefined) return key;
-    if (vars && typeof s === 'string') for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, v);
-    return s;
-  }, [lang]);
+  const t = useCallback((key, vars) => translate(lang, key, vars), [lang]);
 
   const value = useMemo(() => ({ lang, setLang, textSize, setTextSize, t, config, profile, refresh, version, today: config?.today }),
     [lang, textSize, t, config, profile, refresh, version]);
