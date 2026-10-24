@@ -75,4 +75,19 @@ class PaymentMatcherTest {
         assertEquals(Kind.EXACT, s.kind());
         assertEquals(4L, s.allocations().get(0).invoiceId());
     }
+
+    @Test
+    void paymentAgainstDisputedInvoiceIsFlagged() {
+        var x = new OpenInvoice(5L, "INV/26-27/0005", 4L, "Bhosale Auto Components", 10_000_00, 9_000_00, true);
+        var s = PaymentMatcher.match("NEFT BHOSALE AUTO INV/26-27/0005", 9_000_00, List.of(a, x));
+        assertEquals(Kind.DISPUTED, s.kind());
+        assertEquals("LOW", s.confidence());
+        assertTrue(s.reasons().stream().anyMatch(r -> r.code().equals("DISPUTED")));
+    }
+
+    @Test
+    void reasonsCarryMoneyAsPaise() {
+        var s = PaymentMatcher.match("NEFT CR KULKARNI PHARMA INV/26-27/0001", 11_800_00, open);
+        assertTrue(s.reasons().stream().anyMatch(r -> r.code().equals("AMOUNT_EQUALS") && r.v().get("amountPaise").equals(11_800_00L)));
+    }
 }
