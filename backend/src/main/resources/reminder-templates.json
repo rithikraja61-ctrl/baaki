@@ -1,5 +1,5 @@
 {
-  "_note": "Reminder text for every ladder stage. Used by the app (wa.me, SMS, mailto) and by the daily email job. Keep backend/src/main/resources/reminder-templates.json identical (copy this file).",
+  "_note": "Reminder text for every ladder stage. Used by the app (wa.me, SMS, mailto) and by the daily email job. Languages: en, hi, mr. Keep backend/src/main/resources/reminder-templates.json identical (copy this file).",
   "en": {
     "subject": "{business}: payment reminder for {invoices}",
     "linksTitle": "Invoice and payment links:",
@@ -30,6 +30,22 @@
       "FINAL": "प्रिय {contact}, बिल {invoices} के लिए यह आख़िरी रिमाइंडर है: {amount} को {days} दिन हो गए हैं। कृपया 3 दिन में भुगतान करें या तारीख़ तय करने के लिए मुझे {phone} पर फ़ोन करें: {link}। {owner}, {business}।",
       "DEMAND_LETTER": "प्रिय {contact}, बिल {invoices} के {amount} को {days} दिन हो गए हैं। हम आपको विवरण और 7 दिन की समय-सीमा के साथ भुगतान माँग पत्र भेज रहे हैं। यहाँ भुगतान करें: {link}। {owner}, {business}।",
       "NEXT_STEPS": "प्रिय {contact}, बिल {invoices} ({amount}) को {days} दिन हो गए हैं। कृपया आज ही {owner} को {phone} पर फ़ोन करें। यहाँ भुगतान करें: {link}। {business}।"
+    }
+  },
+  "mr": {
+    "subject": "{business}: बिल {invoices} च्या पैशांची आठवण",
+    "linksTitle": "बिल आणि पैसे भरण्याच्या लिंक:",
+    "invoiceLink": "बिल पहा",
+    "payLink": "ऑनलाइन पैसे भरा",
+    "footer": "काही प्रश्न? {business} चे {owner} यांच्याशी संपर्क करा: {phone}, {email}.",
+    "testBanner": "टेस्ट मोड: हा ईमेल {to} यांना गेला असता.",
+    "stages": {
+      "HEADS_UP": "नमस्कार {contact}, {business} कडून एक आठवण: बिल {invoices} चे {amount} {dueDate} रोजी देय आहेत. बिल पाहून इथे पैसे भरा: {link}. धन्यवाद!",
+      "DUE_TODAY": "नमस्कार {contact}, {business} चे बिल {invoices} ({amount}) आज देय आहे. कृपया पैसे भरा: {link}. धन्यवाद.",
+      "FIRM": "नमस्कार {contact}, बिल {invoices} ({amount}) ची देय तारीख जाऊन {days} दिवस झाले. पैसे कधी मिळतील ते कळवा, किंवा इथे भरा: {link}. {owner}, {business}.",
+      "FINAL": "नमस्कार {contact}, बिल {invoices} साठी ही शेवटची आठवण आहे: {amount} चे {days} दिवस झाले. कृपया 3 दिवसांत पैसे भरा किंवा तारीख ठरवण्यासाठी मला {phone} वर फोन करा: {link}. {owner}, {business}.",
+      "DEMAND_LETTER": "नमस्कार {contact}, बिल {invoices} चे {amount} {days} दिवस थकले आहेत. आम्ही तुम्हाला तपशील आणि 7 दिवसांची मुदत असलेले पैसे मागणी पत्र पाठवत आहोत. इथे भरा: {link}. {owner}, {business}.",
+      "NEXT_STEPS": "नमस्कार {contact}, बिल {invoices} ({amount}) चे {days} दिवस थकले आहेत. हे मिटवण्यासाठी कृपया आजच {owner} यांना {phone} वर फोन करा. इथे भरा: {link}. {business}."
     }
   }
 }
