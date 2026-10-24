@@ -16,11 +16,13 @@ import Documents from './pages/Documents.jsx';
 import EvidencePack from './pages/EvidencePack.jsx';
 import Settings from './pages/Settings.jsx';
 import PayLink from './pages/PayLink.jsx';
+import InvoiceView from './pages/InvoiceView.jsx';
 
 export default function App() {
   return (
     <Routes>
       <Route path="/pay/:token" element={<PayLink />} />
+      <Route path="/invoice/:token" element={<InvoiceView />} />
       <Route path="/invoices/:id/print" element={<InvoicePrint />} />
       <Route path="/letters/demand" element={<DemandLetter />} />
       <Route path="/documents/:id/evidence" element={<EvidencePack />} />
