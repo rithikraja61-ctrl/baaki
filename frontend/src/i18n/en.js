@@ -55,7 +55,7 @@ export default {
   chase: { title: 'Chase these first', intro: 'Overdue invoices ranked by amount, days overdue, how the customer usually pays, and how much collecting it helps your cash gap.', score: 'Score', none: 'Nothing is overdue.',
     why: '{amt}, {d} days overdue', usually: 'customer usually pays {n} days late', onTime: 'customer usually pays on time', covers: 'covers the shortfall in week {w}', paused: 'reminders paused' },
   letter: {
-    disclaimer: 'This letter is from {biz} about money owed for the invoices listed below. It is not a GST notice and it is not a notice from a lawyer.', notIncluded: '(not included in the amount demanded)',
+    disclaimer: 'This letter is from {biz} about money owed for the invoices listed below. It is not a GST notice and it is not a notice from a lawyer.', notIncluded: '(not included in the amount demanded)', msmeLine: 'Under the MSMED Act, 2006, buyers should pay micro and small suppliers within the agreed period, which cannot exceed 45 days, and interest applies on late payment.',
     title: 'Payment Demand Letter', build: 'Build letter', customer: 'Customer', includeInterest: 'Add MSME interest to the amount demanded', invoices: 'Invoices included',
     to: 'To', subject: 'Subject: Payment due for the invoices listed below', dear: 'Dear {name},', body1: 'Our records show that the following invoices are unpaid. We request you to pay the amount still owed by {date}.',
     colInvoice: 'Invoice no.', colDate: 'Invoice date', colDue: 'Due date', colAmount: 'Amount', colPaid: 'Paid / credited', colOwed: 'Still owed', colDays: 'Days overdue',
