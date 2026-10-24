@@ -15,4 +15,6 @@ public class Customer {
     public String stateCode;
     public String gstin;
     public int creditDays;
+    /** en, hi or mr: language of this customer's reminders and pay link. */
+    public String preferredLanguage = "en";
 }
