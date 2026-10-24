@@ -7,6 +7,8 @@ import { ErrorBox, Notice, PageTitle } from '../components/ui.jsx';
 export default function Settings() {
   const { t, lang, setLang, textSize, setTextSize, config, profile, refresh, today } = useApp();
   const ladder = useLoad('/settings/ladder');
+  const auto = useLoad('/autosend/status');
+  const [as, setAs] = useState(null);
   const [p, setP] = useState(null);
   const [lad, setLad] = useState([]);
   const [demo, setDemo] = useState('');
@@ -15,6 +17,8 @@ export default function Settings() {
   useEffect(() => { if (profile) setP({ ...profile, turnover: paiseToInput(profile.turnoverPaise), cash: paiseToInput(profile.cashInBankPaise), buffer: paiseToInput(profile.safetyBufferPaise) }); }, [profile]);
   useEffect(() => { if (ladder.data) setLad(ladder.data); }, [ladder.data]);
   useEffect(() => { if (today) setDemo(today); }, [today]);
+  useEffect(() => { if (auto.data) setAs({ enabled: auto.data.enabled, testMode: auto.data.testMode, ownerEmail: auto.data.ownerEmail || '' }); }, [auto.data]);
+  const [runRes, setRunRes] = useState(null);
   const run = async (fn, ok) => { setErr(null); setMsg(null); try { await fn(); await refresh(); setMsg(ok); window.scrollTo(0, 0); } catch (e) { setErr(e); window.scrollTo(0, 0); } };
   if (!p) return null;
   const set = (k) => (e) => setP({ ...p, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
@@ -76,11 +80,31 @@ export default function Settings() {
               <label className="sr-only" htmlFor={`lo${i}`}>{t('set.offset')}</label>
               <input id={`lo${i}`} type="number" className="input w-28" value={s.offsetDays} onChange={(e) => setLad(lad.map((x, j) => (j === i ? { ...x, offsetDays: Number(e.target.value) } : x)))} />
               <label className="flex items-center gap-2 min-h-[48px]"><input type="checkbox" className="w-6 h-6" checked={s.enabled} onChange={(e) => setLad(lad.map((x, j) => (j === i ? { ...x, enabled: e.target.checked } : x)))} />{t('set.enabled')}</label>
+              {['DEMAND_LETTER', 'NEXT_STEPS'].includes(s.code)
+                ? <span className="text-sm muted">{t('auto.manualOnly')}</span>
+                : <label className="flex items-center gap-2 min-h-[48px]"><input type="checkbox" className="w-6 h-6" checked={!!s.autoSend} onChange={(e) => setLad(lad.map((x, j) => (j === i ? { ...x, autoSend: e.target.checked } : x)))} />{t('auto.stageAuto')}</label>}
             </li>
           ))}
         </ul>
         <button className="btn-primary mt-3">{t('common.save')}</button>
       </form>
+
+      {as && (
+        <form className="card mb-4" onSubmit={(e) => { e.preventDefault(); run(async () => { await api.put('/settings/autosend', as); auto.reload(); }, t('common.saved')); }}>
+          <h2 className="h2">{t('auto.title')}</h2>
+          <p className="muted mb-2">{t('auto.help')}</p>
+          {auto.data && !auto.data.configured && <Notice tone="warn">{t('auto.notConfigured')}</Notice>}
+          <label className="flex items-center gap-3 min-h-[48px]"><input type="checkbox" className="w-6 h-6" checked={as.enabled} onChange={(e) => setAs({ ...as, enabled: e.target.checked })} />{t('auto.enable')}</label>
+          <label className="flex items-center gap-3 min-h-[48px]"><input type="checkbox" className="w-6 h-6" checked={as.testMode} onChange={(e) => setAs({ ...as, testMode: e.target.checked })} />{t('auto.testMode')}</label>
+          <div className="mt-2"><label className="label" htmlFor="s-oe">{t('auto.ownerEmail')}</label><input id="s-oe" type="email" className="input" value={as.ownerEmail} onChange={(e) => setAs({ ...as, ownerEmail: e.target.value })} /></div>
+          <p className="text-sm muted mt-1">{t('auto.ownerEmailHelp')}</p>
+          <div className="flex flex-wrap gap-2 mt-3">
+            <button className="btn-primary">{t('common.save')}</button>
+            <button type="button" className="btn-secondary" onClick={() => run(async () => { setRunRes(await api.post('/autosend/run')); auto.reload(); }, t('auto.ran'))}>{t('auto.runNow')}</button>
+          </div>
+          {runRes && <p className="mt-2 text-sm">{t('auto.result', { s: runRes.sent, f: runRes.failed, k: runRes.skipped.length })}</p>}
+        </form>
+      )}
     </div>
   );
 }
