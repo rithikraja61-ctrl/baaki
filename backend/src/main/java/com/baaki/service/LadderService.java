@@ -58,7 +58,7 @@ public class LadderService {
 
     public record FollowUp(Long customerId, String customerName, String contactPerson, String phone, String email,
                            String stage, int stageOffset, long totalPaise, int maxDaysOverdue,
-                           List<FollowUpInvoice> invoices) {}
+                           List<FollowUpInvoice> invoices, String language) {}
 
     public record PausedItem(Long invoiceId, String invoiceNumber, String customerName, String reason, LocalDate until) {}
 
@@ -87,7 +87,7 @@ public class LadderService {
             Customer c = s.customer(i);
             String key = c.id + ":" + st.code;
             FollowUp f = groups.computeIfAbsent(key, k -> new FollowUp(c.id, c.name, c.contactPerson, c.phone, c.email,
-                    st.code, st.offsetDays, 0, 0, new ArrayList<>()));
+                    st.code, st.offsetDays, 0, 0, new ArrayList<>(), com.baaki.domain.Languages.orEnglish(c.preferredLanguage)));
             f.invoices().add(new FollowUpInvoice(i.id, i.invoiceNumber, i.invoiceDate, i.dueDate, s.outstanding(i),
                     (int) java.time.temporal.ChronoUnit.DAYS.between(i.dueDate, s.today), i.payToken));
         }
@@ -96,7 +96,7 @@ public class LadderService {
             long total = f.invoices().stream().mapToLong(FollowUpInvoice::outstandingPaise).sum();
             int max = f.invoices().stream().mapToInt(FollowUpInvoice::daysOverdue).max().orElse(0);
             out.add(new FollowUp(f.customerId(), f.customerName(), f.contactPerson(), f.phone(), f.email(), f.stage(),
-                    f.stageOffset(), total, max, f.invoices()));
+                    f.stageOffset(), total, max, f.invoices(), f.language()));
         }
         out.sort(Comparator.comparingInt((FollowUp f) -> byCode.get(f.stage()).sortOrder).reversed()
                 .thenComparing(FollowUp::totalPaise, Comparator.reverseOrder()));
