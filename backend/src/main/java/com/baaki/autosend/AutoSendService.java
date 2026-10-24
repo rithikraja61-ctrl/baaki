@@ -127,7 +127,7 @@ public class AutoSendService {
         row.attempts++;
         try {
             if (row.recipient == null || row.recipient.isBlank()) throw new IllegalStateException("No owner email set for test mode");
-            String lang = p.language == null ? "en" : p.language;
+            String lang = com.baaki.domain.Languages.orEnglish(f.language()); // customer's preferred language
             ReminderComposer.Email e = ReminderComposer.compose(templates.get(lang), lang, p, f, mail.publicBaseUrl(),
                     p.autoSendTestMode ? f.email() : null);
             String subject = p.autoSendTestMode ? "[TEST] " + e.subject() : e.subject();
