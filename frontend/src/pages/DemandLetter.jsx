@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { useApp, useLoad } from '../lib/AppContext.jsx';
+import { translate, useApp, useLoad } from '../lib/AppContext.jsx';
 import { fmtDate, money } from '../lib/format.js';
-import { ErrorBox, Loading, Notice, QR } from '../components/ui.jsx';
+import { Bi, ErrorBox, Loading, Notice, QR } from '../components/ui.jsx';
 import { NextSteps } from './FollowUps.jsx';
 
 /**
  * "Payment Demand Letter": a plain request for payment from the business. No emblem, seal, or court wording.
- * Interface chrome follows the app language; the letter body follows the chosen letter language.
+ * Interface chrome follows the app language. The letter itself is in English; if the owner picked a second
+ * document language in Settings, it is printed in small text under each heading (and under the disclaimer).
  */
 export default function DemandLetter() {
-  const { t, lang } = useApp();
+  const { t } = useApp();
   const [sp, setSp] = useSearchParams();
   const customerId = sp.get('customerId') || '';
   const invoiceIds = sp.get('invoiceIds') || '';
@@ -22,6 +23,9 @@ export default function DemandLetter() {
   const q = customerId ? `/letters/demand?customerId=${customerId}${invoiceIds ? `&invoiceIds=${invoiceIds}` : ''}&includeInterest=${interest}` : null;
   const { data: L, error, loading } = useLoad(q, [interest]);
   const maxDays = L ? Math.max(...L.lines.map((l) => l.daysOverdue)) : 0;
+  const second = L?.business?.docSecondLanguage || null;
+  const te = (k, v) => translate('en', k, v);
+  const H = (props) => <Bi second={second} {...props} />;
   return (
     <div className="p-3 sm:p-6">
       <div className="no-print max-w-3xl mx-auto mb-4 space-y-3">
@@ -43,7 +47,7 @@ export default function DemandLetter() {
       </div>
       {loading && q && !L && <Loading />}
       {L && (
-        <article className="a4 shadow" lang={lang} aria-label={L.title}>
+        <article className="a4 shadow" lang="en" aria-label={L.title}>
           <header className="border-b-2 border-black pb-2 flex flex-wrap justify-between gap-4">
             <div>
               <div className="text-xl font-bold">{L.business.name}</div>
@@ -52,47 +56,46 @@ export default function DemandLetter() {
               {L.business.udyamRegistered && L.business.udyamNumber && <div>Udyam: {L.business.udyamNumber}</div>}
               <div>{L.business.phone} · {L.business.email}</div>
             </div>
-            <div className="text-right">{t('common.date')}: {fmtDate(L.letterDate, lang)}</div>
+            <div className="text-right"><H k="common.date" />: {fmtDate(L.letterDate)}</div>
           </header>
-          <h1 className="text-2xl font-bold text-center my-3">{t('letter.title')}</h1>
-          <p className="border-2 border-black p-2 font-semibold">{t('letter.disclaimer', { biz: L.business.name })}</p>
-          {lang === 'hi' && <p className="text-sm mt-1">{L.disclaimer}</p>}
-          <div className="mt-3"><div className="font-bold">{t('letter.to')}</div><div>{L.customer.name}</div><div>{L.customer.address}</div>{L.customer.gstin && <div>GSTIN: {L.customer.gstin}</div>}</div>
-          <p className="mt-3 font-semibold">{t('letter.subject')}</p>
-          <p className="mt-2">{t('letter.dear', { name: L.customer.contactPerson || L.customer.name })}</p>
-          <p className="mt-2">{t('letter.body1', { date: fmtDate(L.payByDate, lang) })}</p>
+          <h1 className="text-2xl font-bold text-center my-3"><H k="letter.title" /></h1>
+          <p className="border-2 border-black p-2 font-semibold"><H k="letter.disclaimer" vars={{ biz: L.business.name }} /></p>
+          <div className="mt-3"><div className="font-bold"><H k="letter.to" /></div><div>{L.customer.name}</div><div>{L.customer.address}</div>{L.customer.gstin && <div>GSTIN: {L.customer.gstin}</div>}</div>
+          <p className="mt-3 font-semibold"><H k="letter.subject" /></p>
+          <p className="mt-2">{te('letter.dear', { name: L.customer.contactPerson || L.customer.name })}</p>
+          <p className="mt-2">{te('letter.body1', { date: fmtDate(L.payByDate) })}</p>
           <div className="overflow-x-auto"><table className="mt-3 text-sm">
-            <thead><tr><th>{t('letter.colInvoice')}</th><th>{t('letter.colDate')}</th><th>{t('letter.colDue')}</th><th>{t('letter.colAmount')}</th><th>{t('letter.colPaid')}</th><th>{t('letter.colOwed')}</th><th>{t('letter.colDays')}</th></tr></thead>
+            <thead><tr><th><H k="letter.colInvoice" /></th><th><H k="letter.colDate" /></th><th><H k="letter.colDue" /></th><th><H k="letter.colAmount" /></th><th><H k="letter.colPaid" /></th><th><H k="letter.colOwed" /></th><th><H k="letter.colDays" /></th></tr></thead>
             <tbody>
               {L.lines.map((l) => (
-                <tr key={l.invoiceId}><td>{l.invoiceNumber}</td><td>{fmtDate(l.invoiceDate, lang)}</td><td>{fmtDate(l.dueDate, lang)}</td><td className="text-right">{money(l.amountPaise)}</td><td className="text-right">{money(l.paidPaise)}</td><td className="text-right">{money(l.owedPaise)}</td><td className="text-right">{l.daysOverdue}</td></tr>
+                <tr key={l.invoiceId}><td>{l.invoiceNumber}</td><td>{fmtDate(l.invoiceDate)}</td><td>{fmtDate(l.dueDate)}</td><td className="text-right">{money(l.amountPaise)}</td><td className="text-right">{money(l.paidPaise)}</td><td className="text-right">{money(l.owedPaise)}</td><td className="text-right">{l.daysOverdue}</td></tr>
               ))}
-              <tr><td colSpan={5} className="font-bold">{t('letter.totalOwed')}</td><td className="text-right font-bold">{money(L.owedPaise)}</td><td /></tr>
+              <tr><td colSpan={5} className="font-bold"><H k="letter.totalOwed" /></td><td className="text-right font-bold">{money(L.owedPaise)}</td><td /></tr>
             </tbody>
           </table></div>
           {L.msmeEligible && (
             <div className="mt-3 text-sm">
-              <p>{t('letter.msmeLine')}</p>
-              <p className="mt-1">{t('letter.interest')}: <strong>{money(L.interestPaise)}</strong>{!L.includeInterest && ` ${t('letter.notIncluded')}`}</p>
-              <p className="text-xs">{t('letter.interestNote', { rate: L.interestRatePercent, bank: L.bankRatePercent })}</p>
+              <p>{te('letter.msmeLine')}</p>
+              <p className="mt-1"><H k="letter.interest" />: <strong>{money(L.interestPaise)}</strong>{!L.includeInterest && ` ${te('letter.notIncluded')}`}</p>
+              <p className="text-xs">{te('letter.interestNote', { rate: L.interestRatePercent, bank: L.bankRatePercent })}</p>
             </div>
           )}
-          <p className="mt-3 text-lg">{t('letter.demand')}: <strong>{money(L.demandPaise)}</strong> <span className="text-sm">({L.demandInWords})</span></p>
-          <p className="font-semibold">{t('letter.payBy')}: {fmtDate(L.payByDate, lang)}</p>
+          <p className="mt-3 text-lg"><H k="letter.demand" />: <strong>{money(L.demandPaise)}</strong> <span className="text-sm">({L.demandInWords})</span></p>
+          <p className="font-semibold"><H k="letter.payBy" />: {fmtDate(L.payByDate)}</p>
           <section className="mt-3 flex flex-wrap gap-4 items-start">
             <div className="flex-1">
-              <div className="font-bold">{t('letter.howToPay')}</div>
-              <div>{t('letter.bank')}: {L.business.bankName}</div>
-              <div>{t('letter.accName')}: {L.business.accountName}</div>
-              <div>{t('letter.accNo')}: {L.business.accountNumber}</div>
-              <div>{t('letter.ifsc')}: {L.business.ifsc}</div>
-              <div>{t('letter.upi')}: {L.business.upiId}</div>
+              <div className="font-bold"><H k="letter.howToPay" /></div>
+              <div><H k="letter.bank" />: {L.business.bankName}</div>
+              <div><H k="letter.accName" />: {L.business.accountName}</div>
+              <div><H k="letter.accNo" />: {L.business.accountNumber}</div>
+              <div>IFSC: {L.business.ifsc}</div>
+              <div>UPI ID: {L.business.upiId}</div>
             </div>
-            <div className="text-center text-sm"><QR text={L.upiUri} size={120} label={t('letter.scan')} /><div>{t('letter.scan')}</div></div>
+            <div className="text-center text-sm"><QR text={L.upiUri} size={120} label={te('letter.scan')} /><div><H k="letter.scan" /></div></div>
           </section>
-          <p className="mt-3">{t('letter.dispute', { name: L.business.ownerName, phone: L.business.phone, email: L.business.email })}</p>
-          <p className="mt-2">{t('letter.closing')}</p>
-          <div className="mt-8">{t('letter.regards')}<div className="mt-10 border-t border-black inline-block pt-1 pr-10">{L.business.ownerName}, {L.business.name}<br />{t('letter.sign')}</div></div>
+          <p className="mt-3">{te('letter.dispute', { name: L.business.ownerName, phone: L.business.phone, email: L.business.email })}</p>
+          <p className="mt-2">{te('letter.closing')}</p>
+          <div className="mt-8">{te('letter.regards')}<div className="mt-10 border-t border-black inline-block pt-1 pr-10">{L.business.ownerName}, {L.business.name}<br /><H k="letter.sign" /></div></div>
         </article>
       )}
     </div>
