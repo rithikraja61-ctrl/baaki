@@ -29,13 +29,13 @@ export default function Layout() {
   );
   return (
     <div className="min-h-screen lg:flex">
-      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-3 focus:bg-white">Skip to content</a>
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:p-3 focus:bg-white">{t('common.skip')}</a>
       <header className="no-print lg:hidden sticky top-0 z-20 bg-white border-b flex items-center justify-between px-3 h-16">
         <button className="btn-secondary" aria-expanded={open} aria-controls="mobile-nav" onClick={() => setOpen(!open)}>
           <span aria-hidden="true">☰</span><span>{open ? t('nav.close') : t('nav.menu')}</span>
         </button>
         <span className="font-bold text-xl text-brand-800">{t('appName')}</span>
-        <button className="btn-secondary px-3" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} aria-label="Switch language / भाषा बदलें">{lang === 'en' ? 'हिंदी' : 'English'}</button>
+        <button className="btn-secondary px-3" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} aria-label={t('common.switchLang')}>{lang === 'en' ? 'हिंदी' : 'English'}</button>
       </header>
       {open && <div id="mobile-nav" className="no-print lg:hidden bg-white border-b p-3">{nav}</div>}
       <aside className="no-print hidden lg:block w-64 shrink-0 bg-white border-r p-4 min-h-screen sticky top-0">
@@ -45,7 +45,7 @@ export default function Layout() {
           {profile && <div className="text-sm mt-1">{profile.name}</div>}
         </div>
         {nav}
-        <button className="btn-secondary w-full mt-4" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} aria-label="Switch language / भाषा बदलें">{lang === 'en' ? 'हिंदी' : 'English'}</button>
+        <button className="btn-secondary w-full mt-4" onClick={() => setLang(lang === 'en' ? 'hi' : 'en')} aria-label={t('common.switchLang')}>{lang === 'en' ? 'हिंदी' : 'English'}</button>
       </aside>
       <main id="main" className="flex-1 min-w-0 p-3 sm:p-6" key={loc.pathname}>
         {today && <p className="no-print text-sm muted mb-2">{t('common.today')}: <strong>{fmtDate(today, lang)}</strong>{profile?.demoDate ? ` (${t('common.demoDate')})` : ''}</p>}
