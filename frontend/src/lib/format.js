@@ -19,7 +19,7 @@ export const paiseToInput = (p) => (p == null ? '' : `${Math.floor(p / 100)}.${S
 export function fmtDate(iso, lang = 'en') {
   if (!iso) return '';
   const d = new Date(String(iso).slice(0, 10) + 'T00:00:00+05:30');
-  return d.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
+  return d.toLocaleDateString(({ hi: 'hi-IN', mr: 'mr-IN' })[lang] || 'en-IN', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' });
 }
 
 export const addDays = (iso, n) => {
