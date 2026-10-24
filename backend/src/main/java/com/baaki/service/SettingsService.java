@@ -69,16 +69,21 @@ public class SettingsService {
         return profiles.save(p);
     }
 
-    public record Prefs(String language, String textSize) {}
+    public record Prefs(String language, String textSize, String docSecondLanguage) {}
 
     @Transactional
     public BusinessProfile savePrefs(Prefs r) {
         BusinessProfile p = profile();
         if (r.language() != null) {
-            if (!Set.of("en", "hi").contains(r.language())) throw new IllegalArgumentException("Unsupported language");
+            if (!com.baaki.domain.Languages.ALL.contains(r.language())) throw new IllegalArgumentException("Unsupported language");
             p.language = r.language();
         }
         if (r.textSize() != null) p.textSize = r.textSize();
+        if (r.docSecondLanguage() != null) {
+            String d = r.docSecondLanguage().isBlank() || "none".equals(r.docSecondLanguage()) ? null : r.docSecondLanguage();
+            if (d != null && !Set.of("hi", "mr").contains(d)) throw new IllegalArgumentException("Unsupported language");
+            p.docSecondLanguage = d;
+        }
         return profiles.save(p);
     }
 
