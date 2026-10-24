@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useApp, useLoad } from '../lib/AppContext.jsx';
-import { money0 } from '../lib/format.js';
+import { fmtDate, money, money0 } from '../lib/format.js';
 import { ErrorBox, Grade, Loading, PageTitle } from '../components/ui.jsx';
 
 export function CustomerForm({ initial, onSaved, onCancel }) {
@@ -58,10 +58,31 @@ export function reliabilityText(t, r) {
   return t(`cust.reason.${r.reasonCode}`, { p: r.onTimePercent, d: r.avgDaysLate });
 }
 
+function PaymentRecord({ id }) {
+  const { t, lang } = useApp();
+  const { data, error } = useLoad(`/customers/${id}/payments`);
+  if (error) return <ErrorBox error={error} />;
+  if (!data) return <Loading />;
+  if (data.length === 0) return <p className="muted mt-2">{t('cust.histEmpty')}</p>;
+  const timing = (r) => (r.unpaid ? t('cust.histUnpaid', { n: r.daysLate }) : r.daysLate > 0 ? t('cust.late', { n: r.daysLate }) : r.daysLate < 0 ? t('cust.early', { n: -r.daysLate }) : t('cust.onTimeExact'));
+  return (
+    <ul className="divide-y mt-2 text-sm">
+      {data.map((r) => (
+        <li key={r.reference + r.dueDate} className="py-2 flex flex-wrap justify-between gap-x-3">
+          <span><span className="font-semibold">{r.reference}</span> · {money(r.amountPaise)}</span>
+          <span className="muted">{t('cust.histDue')} {fmtDate(r.dueDate, lang)}{r.paidDate ? ` · ${t('cust.histPaid')} ${fmtDate(r.paidDate, lang)}` : ''}</span>
+          <span className={`font-semibold ${r.unpaid || r.daysLate > 15 ? 'text-red-800' : r.daysLate > 0 ? 'text-amber-800' : 'text-green-800'}`}>{timing(r)}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function Customers() {
   const { t } = useApp();
   const { data, error, loading, reload } = useLoad('/customers');
   const [editing, setEditing] = useState(null);
+  const [hist, setHist] = useState(null);
   if (loading && !data) return <Loading />;
   if (error) return <ErrorBox error={error} />;
   return (
@@ -90,7 +111,9 @@ export default function Customers() {
             <div className="flex flex-wrap gap-2 mt-3">
               <Link className="btn-secondary" to={`/invoices/new?customerId=${c.id}`}>{t('cust.newInvoice')}</Link>
               <button className="btn-secondary" onClick={() => { setEditing(c); window.scrollTo(0, 0); }}>{t('inv.edit')}</button>
+              <button className="btn-secondary" aria-expanded={hist === c.id} onClick={() => setHist(hist === c.id ? null : c.id)}>{hist === c.id ? t('cust.hideHistory') : t('cust.history')}</button>
             </div>
+            {hist === c.id && <PaymentRecord id={c.id} />}
           </li>
         ))}
       </ul>
