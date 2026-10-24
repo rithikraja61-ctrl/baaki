@@ -1,0 +1,21 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: baaki-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: baakiroot
+      MYSQL_DATABASE: baaki
+      MYSQL_USER: baaki
+      MYSQL_PASSWORD: baaki
+      TZ: Asia/Kolkata
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
+    ports:
+      - "3307:3306"   # 3306 is taken by the local MySQL80 service
+    volumes:
+      - baaki-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ubaaki", "-pbaaki"]
+      interval: 5s
+      retries: 30
+volumes:
+  baaki-mysql:
