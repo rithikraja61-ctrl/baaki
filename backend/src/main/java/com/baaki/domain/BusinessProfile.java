@@ -31,6 +31,8 @@ public class BusinessProfile {
     public LocalDate demoDate;
     public String language;
     public String textSize;
+    /** null = invoices and demand letters in English only; hi or mr = add that language under each heading. */
+    public String docSecondLanguage;
     @Column(columnDefinition = "MEDIUMTEXT") public String logoDataUrl;
     /** Reply-to address on automatic emails, and the inbox that receives everything in test mode. */
     public String ownerEmail;
