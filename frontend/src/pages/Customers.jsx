@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { api } from '../api/client.js';
 import { useApp, useLoad } from '../lib/AppContext.jsx';
 import { fmtDate, money, money0 } from '../lib/format.js';
-import { ErrorBox, Grade, Loading, PageTitle } from '../components/ui.jsx';
+import { ErrorBox, Grade, LangPicker, Loading, PageTitle } from '../components/ui.jsx';
+import { langName } from '../lib/langs.js';
 
 export function CustomerForm({ initial, onSaved, onCancel }) {
   const { t, config } = useApp();
-  const [f, setF] = useState(initial || { name: '', contactPerson: '', phone: '', email: '', address: '', city: '', stateCode: '27', gstin: '', creditDays: 30 });
+  const [f, setF] = useState(initial || { name: '', contactPerson: '', phone: '', email: '', address: '', city: '', stateCode: '27', gstin: '', creditDays: 30, preferredLanguage: 'en' });
   const [gst, setGst] = useState(null);
   const [err, setErr] = useState(null);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
@@ -48,6 +49,7 @@ export function CustomerForm({ initial, onSaved, onCancel }) {
           </select>
         </div>
         {fld('creditDays', t('cust.creditDays'), { type: 'number', min: 0, max: 365 })}
+        <div><label className="label" htmlFor="cf-lang">{t('cust.language')}</label><LangPicker id="cf-lang" value={f.preferredLanguage || 'en'} onChange={(v) => setF({ ...f, preferredLanguage: v })} /></div>
       </div>
       <div className="flex gap-2"><button className="btn-primary" disabled={gst && !gst.valid}>{t('common.save')}</button>{onCancel && <button type="button" className="btn-secondary" onClick={onCancel}>{t('common.cancel')}</button>}</div>
     </form>
@@ -95,7 +97,7 @@ export default function Customers() {
             <div className="flex items-start gap-3">
               <Grade grade={c.reliability.grade} />
               <div className="flex-1 min-w-0">
-                <h2 className="font-bold text-lg">{c.name}</h2>
+                <h2 className="font-bold text-lg break-words">{c.name}</h2>
                 <div className="text-sm muted">{c.contactPerson} · <a className="underline" href={`tel:${c.phone}`}>{c.phone}</a> · <a className="underline break-all" href={`mailto:${c.email}`}>{c.email}</a></div>
                 <div className="text-sm">{c.gstin ? `GSTIN ${c.gstin}` : t('cust.unregistered')} · {c.stateName}{c.stateCode !== '27' ? ` (${t('cust.otherState')})` : ''}</div>
               </div>
@@ -107,7 +109,7 @@ export default function Customers() {
               <div><dt className="muted">{t('cust.onTime')}</dt><dd className="font-bold">{c.reliability.onTimePercent}%</dd></div>
             </dl>
             <p className="mt-2"><span className="font-semibold">{t('cust.grade')} {c.reliability.grade}:</span> {reliabilityText(t, c.reliability)}</p>
-            <p className="text-sm muted">{t('cust.creditDays')}: {c.creditDays}</p>
+            <p className="text-sm muted">{t('cust.creditDays')}: {c.creditDays} · {t('cust.language')}: <span lang={c.preferredLanguage}>{langName(c.preferredLanguage)}</span></p>
             <div className="flex flex-wrap gap-2 mt-3">
               <Link className="btn-secondary" to={`/invoices/new?customerId=${c.id}`}>{t('cust.newInvoice')}</Link>
               <button className="btn-secondary" onClick={() => { setEditing(c); window.scrollTo(0, 0); }}>{t('inv.edit')}</button>
