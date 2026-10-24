@@ -1,0 +1,18 @@
+package com.baaki.domain;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "customers")
+public class Customer {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) public Long id;
+    public String name;
+    public String contactPerson;
+    public String phone;
+    public String email;
+    public String address;
+    public String city;
+    public String stateCode;
+    public String gstin;
+    public int creditDays;
+}
