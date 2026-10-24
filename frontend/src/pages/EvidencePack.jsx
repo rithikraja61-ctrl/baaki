@@ -22,8 +22,8 @@ export default function EvidencePack() {
         <h1 className="text-xl font-bold">{t('inv.evidence')}: {d.invoice.invoiceNumber} · {d.customer.name}</h1>
         <p>{d.business.name} · {t('common.total')} {money(d.invoice.totalPaise)} · {t('common.paid')} {money(d.summary.paidPaise)} · {t('common.owed')} {money(d.summary.outstandingPaise)}</p>
         <h2 className="font-bold mt-4">{t('inv.timeline')}</h2>
-        <table className="text-sm"><thead><tr><th>{t('common.date')}</th><th>Event</th><th>Details</th></tr></thead>
-          <tbody>{d.timeline.map((e) => <tr key={e.id}><td>{fmtDate(e.eventAt, lang)} {String(e.eventAt).slice(11, 16)}</td><td>{t('ev.' + e.type)}{e.stage ? ` · ${t('fu.stage.' + e.stage)}` : ''}{e.channel ? ` · ${e.channel}` : ''}</td><td className="whitespace-pre-wrap">{e.details}</td></tr>)}</tbody></table>
+        <div className="overflow-x-auto"><table className="text-sm"><thead><tr><th>{t('common.date')}</th><th>{t('common.event')}</th><th>{t('common.details')}</th></tr></thead>
+          <tbody>{d.timeline.map((e) => <tr key={e.id}><td>{fmtDate(e.eventAt, lang)} {String(e.eventAt).slice(11, 16)}</td><td>{t('ev.' + e.type)}{e.stage ? ` · ${t('fu.stage.' + e.stage)}` : ''}{e.channel ? ` · ${e.channel}` : ''}</td><td className="whitespace-pre-wrap">{e.details}</td></tr>)}</tbody></table></div>
         {d.payments.length > 0 && <><h2 className="font-bold mt-4">{t('nav.payments')}</h2>
           <table className="text-sm"><thead><tr><th>{t('common.date')}</th><th>{t('pmt.reference')}</th><th>{t('common.amount')}</th></tr></thead><tbody>{d.payments.map((p) => <tr key={p.paymentId}><td>{fmtDate(p.date, lang)}</td><td>{p.reference}</td><td className="text-right">{money(p.amountPaise)}</td></tr>)}</tbody></table></>}
         {d.creditNotes.length > 0 && <><h2 className="font-bold mt-4">{t('ev.CREDIT_NOTE')}</h2>
