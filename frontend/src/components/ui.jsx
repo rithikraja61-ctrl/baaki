@@ -24,8 +24,9 @@ export function StatusBadge({ status }) {
 }
 
 export function Grade({ grade }) {
+  const { t } = useApp();
   const c = grade === 'A' ? 'bg-green-700' : grade === 'B' ? 'bg-amber-600' : 'bg-red-700';
-  return <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-white font-bold ${c}`} aria-label={`Grade ${grade}`}>{grade}</span>;
+  return <span className={`inline-flex items-center justify-center w-8 h-8 rounded-full text-white font-bold ${c}`} aria-label={t('common.grade', { g: grade })}>{grade}</span>;
 }
 
 /** Plain word with the accounting term in a tooltip (title + screen-reader text). */
