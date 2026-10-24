@@ -29,7 +29,7 @@ public class ReminderTemplates {
 
     public static Map<String, Lang> parse(JsonNode root) {
         Map<String, Lang> m = new HashMap<>();
-        for (String code : new String[]{"en", "hi"}) {
+        for (String code : new String[]{"en", "hi", "mr"}) {
             JsonNode n = root.get(code);
             if (n == null) continue;
             Map<String, String> stages = new LinkedHashMap<>();
