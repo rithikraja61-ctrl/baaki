@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../api/client.js';
-import { useApp, useLoad } from '../lib/AppContext.jsx';
+import { translate, useApp, useLoad } from '../lib/AppContext.jsx';
 import { fmtDate, money, upiUri } from '../lib/format.js';
-import { ErrorBox, Loading, Notice, QR } from '../components/ui.jsx';
+import { ErrorBox, LangPicker, Loading, Notice, QR } from '../components/ui.jsx';
 import InvoiceDocument from '../components/InvoiceDocument.jsx';
 
-/** What the customer sees. No login. */
+/**
+ * What the customer sees. No login. Shown in the customer's preferred language (set on their customer record);
+ * ?lang=xx in the link or the picker overrides it for this visit only, without touching the owner's app language.
+ */
 export default function PayLink() {
   const { token } = useParams();
-  const { t, lang, setLang, today } = useApp();
+  const { today } = useApp();
   const { data: d, error, loading, reload } = useLoad(`/public/pay/${token}`);
+  const [chosen, setChosen] = useState(() => new URLSearchParams(window.location.search).get('lang'));
+  const lang = ['en', 'hi', 'mr'].includes(chosen) ? chosen : (d?.customer?.preferredLanguage || 'en');
+  const t = (k, v) => translate(lang, k, v);
   const [mode, setMode] = useState(null);
   const [ref, setRef] = useState('');
   const [paidOn, setPaidOn] = useState('');
@@ -18,18 +24,18 @@ export default function PayLink() {
   const [done, setDone] = useState(null);
   const [err, setErr] = useState(null);
   if (loading && !d) return <Loading />;
-  if (error) return <div className="p-6"><Notice tone="warn">{t('pay.invalid')}</Notice></div>;
+  if (error || !d) return <div className="p-6"><Notice tone="warn">{translate(chosen || 'en', 'pay.invalid')}</Notice></div>;
   const b = d.business, inv = d.invoice, owed = d.summary.outstandingPaise;
   const uri = upiUri({ upiId: b.upiId, name: b.name, amountPaise: owed, note: inv.invoiceNumber });
   const submit = async (path, body, msg) => { setErr(null); try { await api.post(`/public/pay/${token}/${path}`, body); setDone(msg); setMode(null); reload(); } catch (e) { setErr(e); } };
   return (
-    <div className="max-w-xl mx-auto p-3 sm:p-6 space-y-4">
-      <div className="flex justify-between items-center no-print">
-        <h1 className="text-xl font-bold">{t('pay.title', { biz: b.name })}</h1>
-        <button className="btn-secondary" aria-label={t('common.switchLang')} onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}>{lang === 'en' ? 'हिंदी' : 'English'}</button>
+    <div className="max-w-xl mx-auto p-3 sm:p-6 space-y-4" lang={lang}>
+      <div className="flex justify-between items-center gap-2 no-print">
+        <h1 className="text-xl font-bold min-w-0 break-words">{t('pay.title', { biz: b.name })}</h1>
+        <LangPicker value={lang} onChange={setChosen} label={t('pay.language')} className="w-auto max-w-[8.5rem] shrink-0" />
       </div>
       <section className="card text-center">
-        <div className="muted">{inv.invoiceNumber} · {d.customer.name}</div>
+        <div className="muted break-words">{inv.invoiceNumber} · {d.customer.name}</div>
         <div className="text-sm muted">{t('pay.amountOwed')}</div>
         <div className="text-4xl font-bold my-1">{money(owed)}</div>
         <div>{t('pay.dueOn', { d: fmtDate(inv.dueDate, lang) })}</div>
