@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { LANGS } from '../lib/langs.js';
 import QRCode from 'qrcode';
-import { useApp } from '../lib/AppContext.jsx';
+import { translate, useApp } from '../lib/AppContext.jsx';
 
 const STATUS_STYLE = {
   DRAFT: 'bg-gray-100 text-gray-800 border-gray-400',
@@ -72,5 +73,26 @@ export function PageTitle({ children, actions }) {
       <h1 className="text-2xl font-bold">{children}</h1>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
+  );
+}
+
+/** Language picker: every language name in its own script. `lang` attribute on each option helps screen readers. */
+export function LangPicker({ value, onChange, id, label, className = '' }) {
+  return (
+    <select id={id} aria-label={id ? undefined : label} className={`input ${className}`} value={value} onChange={(e) => onChange(e.target.value)}>
+      {LANGS.map((l) => <option key={l.code} value={l.code} lang={l.code}>{l.name}</option>)}
+    </select>
+  );
+}
+
+/**
+ * Bilingual heading for statutory documents: English always, plus the owner's chosen second language
+ * in small text underneath. `second` is null for English-only.
+ */
+export function Bi({ k, vars, second, className = '' }) {
+  const en = translate('en', k, vars);
+  if (!second) return <span className={className}>{en}</span>;
+  return (
+    <span className={className}>{en}<span lang={second} className="block text-[0.78em] font-normal leading-snug break-words">{translate(second, k, vars)}</span></span>
   );
 }
