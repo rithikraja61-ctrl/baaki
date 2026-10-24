@@ -7,7 +7,7 @@ import { ErrorBox, Loading, Notice, QR } from '../components/ui.jsx';
 import { NextSteps } from './FollowUps.jsx';
 
 /**
- * "Payment Demand Letter" — never a legal notice. No emblem, seal, or lawyer/court/GST wording.
+ * "Payment Demand Letter": a plain request for payment from the business. No emblem, seal, or court wording.
  * Interface chrome follows the app language; the letter body follows the chosen letter language.
  */
 export default function DemandLetter() {
@@ -44,7 +44,7 @@ export default function DemandLetter() {
       {loading && q && !L && <Loading />}
       {L && (
         <article className="a4 shadow" lang={lang} aria-label={L.title}>
-          <header className="border-b-2 border-black pb-2 flex justify-between gap-4">
+          <header className="border-b-2 border-black pb-2 flex flex-wrap justify-between gap-4">
             <div>
               <div className="text-xl font-bold">{L.business.name}</div>
               <div>{L.business.address}</div>
@@ -55,15 +55,13 @@ export default function DemandLetter() {
             <div className="text-right">{t('common.date')}: {fmtDate(L.letterDate, lang)}</div>
           </header>
           <h1 className="text-2xl font-bold text-center my-3">{t('letter.title')}</h1>
-          <p className="border-2 border-black p-2 font-semibold">{lang === 'hi'
-            ? `यह पत्र ${L.business.name} की ओर से नीचे दिए गए बिलों के बकाया पैसों के बारे में है। यह GST विभाग का नोटिस नहीं है और किसी वकील का क़ानूनी नोटिस भी नहीं है।`
-            : L.disclaimer}</p>
+          <p className="border-2 border-black p-2 font-semibold">{t('letter.disclaimer', { biz: L.business.name })}</p>
           {lang === 'hi' && <p className="text-sm mt-1">{L.disclaimer}</p>}
           <div className="mt-3"><div className="font-bold">{t('letter.to')}</div><div>{L.customer.name}</div><div>{L.customer.address}</div>{L.customer.gstin && <div>GSTIN: {L.customer.gstin}</div>}</div>
           <p className="mt-3 font-semibold">{t('letter.subject')}</p>
           <p className="mt-2">{t('letter.dear', { name: L.customer.contactPerson || L.customer.name })}</p>
           <p className="mt-2">{t('letter.body1', { date: fmtDate(L.payByDate, lang) })}</p>
-          <table className="mt-3 text-sm">
+          <div className="overflow-x-auto"><table className="mt-3 text-sm">
             <thead><tr><th>{t('letter.colInvoice')}</th><th>{t('letter.colDate')}</th><th>{t('letter.colDue')}</th><th>{t('letter.colAmount')}</th><th>{t('letter.colPaid')}</th><th>{t('letter.colOwed')}</th><th>{t('letter.colDays')}</th></tr></thead>
             <tbody>
               {L.lines.map((l) => (
@@ -71,17 +69,17 @@ export default function DemandLetter() {
               ))}
               <tr><td colSpan={5} className="font-bold">{t('letter.totalOwed')}</td><td className="text-right font-bold">{money(L.owedPaise)}</td><td /></tr>
             </tbody>
-          </table>
+          </table></div>
           {L.msmeEligible && (
             <div className="mt-3 text-sm">
               <p>{L.msmeLine}</p>
-              <p className="mt-1">{t('letter.interest')}: <strong>{money(L.interestPaise)}</strong>{!L.includeInterest && ' (not included in the amount demanded)'}</p>
+              <p className="mt-1">{t('letter.interest')}: <strong>{money(L.interestPaise)}</strong>{!L.includeInterest && ` ${t('letter.notIncluded')}`}</p>
               <p className="text-xs">{t('letter.interestNote', { rate: L.interestRatePercent, bank: L.bankRatePercent })}</p>
             </div>
           )}
           <p className="mt-3 text-lg">{t('letter.demand')}: <strong>{money(L.demandPaise)}</strong> <span className="text-sm">({L.demandInWords})</span></p>
           <p className="font-semibold">{t('letter.payBy')}: {fmtDate(L.payByDate, lang)}</p>
-          <section className="mt-3 flex gap-4 items-start">
+          <section className="mt-3 flex flex-wrap gap-4 items-start">
             <div className="flex-1">
               <div className="font-bold">{t('letter.howToPay')}</div>
               <div>{t('letter.bank')}: {L.business.bankName}</div>
