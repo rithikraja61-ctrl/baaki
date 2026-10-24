@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { api } from '../api/client.js';
 import { useApp, useLoad } from '../lib/AppContext.jsx';
 import { paiseToInput, toPaise } from '../lib/format.js';
-import { ErrorBox, Notice, PageTitle } from '../components/ui.jsx';
+import { ErrorBox, LangPicker, Notice, PageTitle } from '../components/ui.jsx';
+import { LANGS } from '../lib/langs.js';
 
 export default function Settings() {
   const { t, lang, setLang, textSize, setTextSize, config, profile, refresh, today } = useApp();
@@ -32,8 +33,17 @@ export default function Settings() {
       <section className="card mb-4">
         <h2 className="h2">{t('set.prefs')}</h2>
         <div className="grid sm:grid-cols-2 gap-3">
-          <div><label className="label" htmlFor="lang">{t('set.language')}</label><select id="lang" className="input" value={lang} onChange={(e) => setLang(e.target.value)}><option value="en">English</option><option value="hi">हिंदी</option></select></div>
+          <div><label className="label" htmlFor="lang">{t('set.language')}</label><LangPicker id="lang" value={lang} onChange={setLang} /></div>
           <div><label className="label" htmlFor="ts">{t('set.textSize')}</label><select id="ts" className="input" value={textSize} onChange={(e) => setTextSize(e.target.value)}><option value="normal">{t('set.normal')}</option><option value="large">{t('set.large')}</option><option value="xlarge">{t('set.xlarge')}</option></select></div>
+          <div className="sm:col-span-2">
+            <label className="label" htmlFor="docLang">{t('set.docLang')}</label>
+            <select id="docLang" className="input" aria-describedby="docLang-help" value={profile?.docSecondLanguage || 'none'}
+              onChange={(e) => run(() => api.put('/settings/prefs', { docSecondLanguage: e.target.value }), t('common.saved'))}>
+              <option value="none">{t('set.docLangNone')}</option>
+              {LANGS.filter((l) => l.code !== 'en').map((l) => <option key={l.code} value={l.code} lang={l.code}>English + {l.name}</option>)}
+            </select>
+            <p id="docLang-help" className="text-sm muted mt-1">{t('set.docLangHelp')}</p>
+          </div>
         </div>
       </section>
 
