@@ -84,4 +84,14 @@ export default {
     prefs: 'Language and text', language: 'Language', textSize: 'Text size', normal: 'Normal', large: 'Large', xlarge: 'Extra large',
     demo: 'Demo date', demoHelp: 'Move "today" forward to watch reminders, letters and the forecast change.', setDemo: 'Set demo date', clearDemo: 'Use real date', reset: 'Reset demo', resetConfirm: 'Restore all sample data? Your changes will be lost.', resetDone: 'Demo data restored.',
   },
+  auto: {
+    title: 'Automatic email reminders', help: 'Every day at 10:00 IST, Baaki emails the reminders due that day for the steps switched on above. Emails go out in your business name with your email as reply-to. Payment Demand Letters are never sent automatically.',
+    enable: 'Send reminders automatically', testMode: 'Test mode: send every email to my own address instead of customers', ownerEmail: 'Your email (reply-to and test copies)',
+    ownerEmailHelp: 'Customers who reply to a reminder reach this address.', stageAuto: 'Email automatically', manualOnly: 'You always press Send',
+    runNow: "Send today's reminders now", ran: 'Done', result: 'Sent {s}, failed {f}, skipped {k}.',
+    on: 'Switched on: runs every day at 10:00 IST.', off: 'Switched off. Turn it on in Settings.', testOn: 'Test mode: all emails go to {e}.', test: 'test',
+    notConfigured: 'Email is not set up yet. Add MAIL_PROVIDER, MAIL_FROM and the key to .env (see .env.example), then restart.',
+    failed: '{n} emails failed. Retry them:', retry: 'Retry', sentToday: '{n} emails sent today',
+  },
+  invView: { title: 'Invoice', pay: 'Pay this invoice' },
 };
