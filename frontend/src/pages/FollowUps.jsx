@@ -32,6 +32,7 @@ function FollowUpCard({ f, onDone }) {
     invoices: f.invoices.map((i) => i.invoiceNumber).join(', '), amount: money(f.totalPaise),
     days: Math.max(0, f.maxDaysOverdue), dueDate: fmtDate(f.invoices[0].dueDate, msgLang),
     link: f.invoices.map((i) => `${origin}/pay/${i.payToken}`).join(' '), owner: profile?.ownerName, phone: profile?.phone,
+    email: profile?.ownerEmail || profile?.email,
   });
   const phone = (f.phone || '').replace(/\D/g, '');
   const enc = encodeURIComponent(message);
@@ -76,6 +77,45 @@ function FollowUpCard({ f, onDone }) {
   );
 }
 
+function AutoSendPanel() {
+  const { t, lang } = useApp();
+  const { data, reload } = useLoad('/autosend/status');
+  const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(null);
+  if (!data) return null;
+  const retry = async (id) => { setErr(null); setBusy(id); try { await api.post(`/autosend/${id}/retry`); } catch (e) { setErr(e); } setBusy(null); reload(); };
+  const sentToday = data.today.filter((l) => l.status === 'SENT');
+  return (
+    <section className="card mb-4" aria-labelledby="auto-h">
+      <h2 id="auto-h" className="h2">{t('auto.title')}</h2>
+      <p className="muted">{data.enabled ? t('auto.on') : t('auto.off')} {data.testMode && <strong>{t('auto.testOn', { e: data.ownerEmail })}</strong>}</p>
+      {!data.configured && <Notice tone="warn">{t('auto.notConfigured')}</Notice>}
+      <ErrorBox error={err} />
+      {data.failed.length > 0 && (
+        <>
+          <h3 className="font-semibold mt-3 text-red-800">{t('auto.failed', { n: data.failed.length })}</h3>
+          <ul className="divide-y">{data.failed.map((l) => (
+            <li key={l.id} className="py-2 flex flex-wrap gap-2 items-center justify-between">
+              <div className="min-w-0 break-words">
+                <div className="font-semibold">{l.customerName} · {t('fu.stage.' + l.stage)}</div>
+                <div className="text-sm muted">{l.invoiceNumbers} · {fmtDate(l.sendDate, lang)} · {l.recipient}</div>
+                <div className="text-sm text-red-800">{l.error === 'NOT_CONFIGURED' ? t('auto.notConfigured') : l.error}</div>
+              </div>
+              <button className="btn-secondary" disabled={busy === l.id} onClick={() => retry(l.id)}>↻ {t('auto.retry')}</button>
+            </li>
+          ))}</ul>
+        </>
+      )}
+      {sentToday.length > 0 && (
+        <>
+          <h3 className="font-semibold mt-3">{t('auto.sentToday', { n: sentToday.length })}</h3>
+          <ul className="text-sm">{sentToday.map((l) => <li key={l.id}>✓ {l.customerName} · {t('fu.stage.' + l.stage)} · {l.recipient}{l.testMode ? ` (${t('auto.test')})` : ''}</li>)}</ul>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function FollowUps() {
   const { t, lang } = useApp();
   const { data, error, loading, reload } = useLoad('/followups/today');
@@ -85,6 +125,7 @@ export default function FollowUps() {
     <div>
       <PageTitle>{t('fu.title')}</PageTitle>
       <p className="muted mb-4">{t('fu.intro')}</p>
+      <AutoSendPanel />
       {data.followUps.length === 0 && <Notice tone="ok">{t('fu.none')}</Notice>}
       <ul className="space-y-4">{data.followUps.map((f) => <FollowUpCard key={`${f.customerId}-${f.stage}`} f={f} onDone={() => {}} />)}</ul>
       {data.paused.length > 0 && (
