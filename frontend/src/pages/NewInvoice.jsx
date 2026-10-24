@@ -42,7 +42,7 @@ export default function NewInvoice() {
   const customer = (custs.data || []).find((c) => String(c.id) === String(customerId));
   useEffect(() => { if (customer && !id) setPlace(customer.stateCode); }, [customerId]); // eslint-disable-line
   const dueDate = customer && invoiceDate ? addDays(invoiceDate, customer.creditDays) : '';
-  const rates = config?.gstRatesBp || cfg.gstRatesBp;
+  const rates = cfg.gstRatesBp; // GST slabs come from src/data/config.js (the backend checks the same list)
 
   const lineErrors = lines.map((l) => ({ rate: Number.isNaN(toPaise(l.rate)), discount: Number.isNaN(toPaise(l.discount)), qty: !(Number(l.quantity) > 0) }));
   const payload = useMemo(() => ({
