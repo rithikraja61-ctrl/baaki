@@ -220,7 +220,8 @@ data = dict(
     business=dict(name='Sharma Packaging', ownerName='Rakesh Sharma', gstin=biz_gstin, stateCode=BIZ_STATE, registrationType='REGULAR',
                   turnoverPaise=3_20_00_000*100, udyamNumber='UDYAM-MH-26-0123456', msmeCategory='SMALL', cashInBankPaise=2_60_000*100, safetyBufferPaise=1_50_000*100),
     customers=[dict(id=c[0], name=c[1], contactPerson=c[2], phone=c[3], email=c[4], city=c[5], address=c[6], stateCode=c[7],
-                    gstin=gstin(c[8]) if c[8] else None, creditDays=c[9]) for c in C],
+                    gstin=gstin(c[8]) if c[8] else None, creditDays=c[9],
+                    preferredLanguage={3:'mr',5:'mr',7:'mr',8:'mr',11:'mr',12:'hi'}.get(c[0], 'en')) for c in C],  # set in V4__languages.sql
     invoices=[dict(id=r['idx']+1, invoiceNumber=r.get('no'), customerId=r['cid'], invoiceDate=str(r['date']), dueDate=str(r['due']), status=r['status'],
                    taxablePaise=r['T']['taxable'], cgstPaise=r['T']['cgst'], sgstPaise=r['T']['sgst'], igstPaise=r['T']['igst'], roundOffPaise=r['T']['round'],
                    totalPaise=r['T']['total'], outstandingPaise=r['outstanding'],
