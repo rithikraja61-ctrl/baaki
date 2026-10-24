@@ -6,15 +6,14 @@ follow up with today, writes GST invoices and Payment Demand Letters, matches ba
 Stack (team override of the brief): **Java 21+ / Spring Boot 3.5 + MySQL 8** backend, **React + Vite + Tailwind** frontend.
 All data is made up. Nothing connects to a bank, GST portal or messaging service.
 
-## Run (Windows)
+## Run (everything in Docker)
 
 ```powershell
-docker compose up -d                 # MySQL 8 on localhost:3307
-cd backend; .\mvnw.cmd spring-boot:run   # API on http://localhost:8080 (Flyway creates schema + sample data)
-cd ..\frontend; npm install; npm run dev # http://localhost:5173
+docker compose up -d --build     # MySQL + API + app
 ```
-
-Tests: `cd backend; .\mvnw.cmd test`
+- App: http://localhost:5190  ·  API: http://localhost:8090/api  ·  MySQL: localhost:3310 (baaki/baaki)
+- The backend image compiles with Java 21 and runs the JUnit tests during `docker compose build backend`.
+- Flyway creates the schema and sample data on first start.
 
 ## Money rules
 - All money is `BIGINT` paise. GST is per line on taxable value, CGST/SGST rounded separately, grand total rounded to the rupee with a Round off line.
