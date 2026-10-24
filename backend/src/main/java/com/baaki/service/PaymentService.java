@@ -36,7 +36,8 @@ public class PaymentService {
         return s.invoices.stream().filter(s::isOpen)
                 .sorted(Comparator.comparing((Invoice i) -> i.dueDate))
                 .map(i -> new PaymentMatcher.OpenInvoice(i.id, i.invoiceNumber, i.customerId, s.customer(i).name,
-                        s.outstanding(i), i.taxablePaise)).toList();
+                        s.outstanding(i), i.taxablePaise,
+                        "DISPUTED".equals(i.status) || s.invoicesWithOpenInbox.contains(i.id))).toList();
     }
 
     public List<PaymentView> list() {
