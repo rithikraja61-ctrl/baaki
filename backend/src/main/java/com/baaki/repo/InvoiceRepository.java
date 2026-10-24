@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     Optional<Invoice> findByPayToken(String token);
     List<Invoice> findByCustomerId(Long customerId);
+    Optional<Invoice> findByInvoiceNumber(String invoiceNumber);
 }
