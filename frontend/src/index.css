@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { font-size: 16px; }
+html.text-large { font-size: 18px; }
+html.text-xlarge { font-size: 20px; }
+body { font-family: 'Noto Sans', 'Noto Sans Devanagari', system-ui, sans-serif; color: #111827; background: #f6f7f5; }
+*:focus-visible { outline: 3px solid #1d4ed8; outline-offset: 2px; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-2 min-h-[48px] px-4 rounded-lg font-semibold border transition-colors; }
+  .btn-primary { @apply btn bg-brand-600 text-white border-brand-600 hover:bg-brand-700; }
+  .btn-secondary { @apply btn bg-white text-brand-800 border-brand-600 hover:bg-brand-50; }
+  .btn-danger { @apply btn bg-white text-red-800 border-red-700 hover:bg-red-50; }
+  .card { @apply bg-white rounded-xl border border-gray-200 p-4 shadow-sm; }
+  .input { @apply w-full min-h-[48px] px-3 rounded-lg border border-gray-400 bg-white text-base; }
+  .label { @apply block font-semibold mb-1; }
+  .h1 { @apply text-2xl font-bold mb-4; }
+  .h2 { @apply text-xl font-bold mb-3; }
+  .muted { @apply text-gray-700; }
+  .table { @apply w-full text-left border-collapse; }
+  .table th { @apply py-2 px-2 border-b-2 border-gray-300 font-semibold text-sm; }
+  .table td { @apply py-2 px-2 border-b border-gray-200 align-top; }
+}
+
+/* A4 print pages */
+.a4 { background: white; width: 210mm; min-height: 297mm; padding: 14mm; margin: 0 auto; color: #000; font-size: 11pt; }
+.a4 table { width: 100%; border-collapse: collapse; }
+.a4 th, .a4 td { border: 1px solid #555; padding: 3px 5px; vertical-align: top; }
+.page-break { break-after: page; }
+@media screen and (max-width: 840px) { .a4 { width: 100%; min-height: auto; padding: 12px; } }
+@media print {
+  @page { size: A4; margin: 0; }
+  body { background: white; }
+  .no-print { display: none !important; }
+  .a4 { width: 210mm; min-height: 297mm; margin: 0; box-shadow: none; }
+}
