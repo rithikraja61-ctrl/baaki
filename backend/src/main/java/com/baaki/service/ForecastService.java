@@ -131,9 +131,10 @@ public class ForecastService {
                 need -= s.outstanding(i);
             }
             if (need > 0) { // also consider overdue invoices already expected inside the window (chasing pulls them earlier)
-                for (Invoice i : s.invoices.stream().filter(i -> expected.containsKey(i.id) && s.daysOverdue(i) > 0
-                        && cover.stream().noneMatch(c -> c.invoiceId().equals(i.id)))
-                        .sorted(Comparator.comparingLong(s::outstanding).reversed()).toList()) {
+                List<Invoice> overdueCands = s.invoices.stream().filter(x -> expected.containsKey(x.id) && s.daysOverdue(x) > 0
+                        && cover.stream().noneMatch(c -> c.invoiceId().equals(x.id)))
+                        .sorted(Comparator.comparingLong(s::outstanding).reversed()).toList();
+                for (Invoice i : overdueCands) {
                     if (need <= 0) break;
                     cover.add(new CoverItem(i.id, i.invoiceNumber, s.customer(i).name, s.outstanding(i), expected.get(i.id)));
                     need -= s.outstanding(i);
