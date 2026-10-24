@@ -105,7 +105,9 @@ public class SettingsService {
             if (c == null) throw new IllegalArgumentException("Unknown stage " + l.code);
             if (l.offsetDays <= prev) throw new IllegalArgumentException("Each step must come after the one before it");
             prev = l.offsetDays;
-            c.offsetDays = l.offsetDays; c.enabled = l.enabled;
+            if (l.autoSend && com.baaki.autosend.AutoSendRules.NEVER_AUTO.contains(c.code))
+                throw new IllegalArgumentException("This step is never sent automatically. You always press Send yourself.");
+            c.offsetDays = l.offsetDays; c.enabled = l.enabled; c.autoSend = l.autoSend;
             ladder.save(c);
         }
         return ladder();
