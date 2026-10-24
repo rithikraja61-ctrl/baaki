@@ -71,6 +71,30 @@ public class CustomerService {
                 IndianStates.name(c.stateCode), c.gstin, c.gstin != null, c.creditDays, owed, overdue, open, st);
     }
 
+    /** One past payment: what was due, when it came in, and how late. */
+    public record PaymentRecord(String reference, java.time.LocalDate dueDate, java.time.LocalDate paidDate,
+                                long amountPaise, int daysLate, boolean unpaid) {}
+
+    /** Payment record, newest first: older history, invoices paid in Baaki, and invoices still unpaid past due. */
+    public List<PaymentRecord> paymentRecord(Long id) {
+        Snapshot s = snapshots.load();
+        if (!s.customers.containsKey(id)) throw new NoSuchElementException("Customer not found");
+        List<PaymentRecord> out = new ArrayList<>();
+        for (PaymentHistory h : s.history)
+            if (h.customerId.equals(id)) out.add(new PaymentRecord(h.reference, h.dueDate, h.paidDate, h.amountPaise,
+                    (int) ChronoUnit.DAYS.between(h.dueDate, h.paidDate), false));
+        for (Invoice i : s.invoices) {
+            if (!i.customerId.equals(id) || "DRAFT".equals(i.status)) continue;
+            var d = s.lastPaymentDate.get(i.id);
+            if (s.outstanding(i) == 0 && d != null)
+                out.add(new PaymentRecord(i.invoiceNumber, i.dueDate, d, i.totalPaise, (int) ChronoUnit.DAYS.between(i.dueDate, d), false));
+            else if (s.isOpen(i) && s.daysOverdue(i) > 0)
+                out.add(new PaymentRecord(i.invoiceNumber, i.dueDate, null, s.outstanding(i), s.daysOverdue(i), true));
+        }
+        out.sort(Comparator.comparing((PaymentRecord r) -> r.paidDate() == null ? s.today : r.paidDate()).reversed());
+        return out;
+    }
+
     public record CustomerReq(String name, String contactPerson, String phone, String email, String address,
                               String city, String stateCode, String gstin, Integer creditDays) {}
 
