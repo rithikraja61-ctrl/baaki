@@ -66,7 +66,7 @@ export default function Forecast() {
           </fieldset>
           <fieldset>
             <label className="flex items-center gap-3 min-h-[48px] font-semibold"><input type="checkbox" className="w-6 h-6" checked={w.delay} onChange={(e) => setW({ ...w, delay: e.target.checked })} />{t('fc.supplierDelay')}</label>
-            <label className="sr-only" htmlFor="wse">Supplier</label>
+            <label className="sr-only" htmlFor="wse">{t('common.supplier')}</label>
             <select id="wse" className="input" disabled={!w.delay} value={w.delayedExpenseId} onChange={(e) => setW({ ...w, delayedExpenseId: e.target.value })}><option value="">—</option>{suppliers.map((e) => <option key={e.id} value={e.id}>{e.name} · {fmtDate(e.dueDate, lang)} · {money0(e.amountPaise)}</option>)}</select>
             <label className="label text-sm mt-1" htmlFor="wdd">{t('fc.delayDays')}</label><input id="wdd" type="number" className="input" disabled={!w.delay} value={w.delayDays} onChange={(e) => setW({ ...w, delayDays: e.target.value })} />
           </fieldset>
