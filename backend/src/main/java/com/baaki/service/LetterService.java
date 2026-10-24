@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
-/** Data for the "Payment Demand Letter". Not a legal notice. */
+/** Data for the "Payment Demand Letter": a plain request for payment from the business itself. */
 @Service
 public class LetterService {
     public static final String TITLE = "Payment Demand Letter";
@@ -32,7 +32,7 @@ public class LetterService {
 
     public static String disclaimer(String businessName) {
         return "This letter is from " + businessName + " about money owed for the invoices listed below. "
-                + "It is not a notice from the GST department and not a legal notice from a lawyer.";
+                + "It is not a GST notice and it is not a notice from a lawyer.";
     }
 
     public record LetterLine(Long invoiceId, String invoiceNumber, LocalDate invoiceDate, LocalDate dueDate,
