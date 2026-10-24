@@ -46,11 +46,11 @@ export default function InvoiceDetail() {
       {msg && <Notice tone="ok">{msg}</Notice>}
       {d.eInvoiceRequired && <Notice tone="warn">{t('inv.eInvoiceNote')}</Notice>}
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 min-w-0">
           <section className="card">
             <div className="flex flex-wrap gap-3 items-center mb-2"><StatusBadge status={s.status} />{s.paused && <span className="font-semibold">⏸ {t('inv.paused')}</span>}</div>
             <dl className="grid grid-cols-2 gap-2">
-              <dt className="muted">{t('common.customer')}</dt><dd className="font-semibold">{d.customer.name}</dd>
+              <dt className="muted">{t('common.customer')}</dt><dd className="font-semibold break-words">{d.customer.name}</dd>
               <dt className="muted">{t('inv.date')}</dt><dd>{fmtDate(inv.invoiceDate, lang)}</dd>
               <dt className="muted">{t('inv.dueDate')}</dt><dd>{fmtDate(inv.dueDate, lang)}{s.daysOverdue > 0 ? ` (${s.daysOverdue} ${t('common.days')})` : ''}</dd>
               <dt className="muted">{t('common.total')}</dt><dd className="font-bold">{money(inv.totalPaise)}</dd>
@@ -89,7 +89,7 @@ export default function InvoiceDetail() {
             </section>
           )}
         </div>
-        <section className="card"><h2 className="h2">{t('inv.timeline')}</h2><Timeline events={d.timeline} /></section>
+        <section className="card min-w-0"><h2 className="h2">{t('inv.timeline')}</h2><Timeline events={d.timeline} /></section>
       </div>
     </div>
   );
