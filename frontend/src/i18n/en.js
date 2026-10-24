@@ -58,6 +58,7 @@ export default {
       AI_BUSY: 'The AI service is busy or the free quota is used up. Try again in a minute.', AI_TIMEOUT: 'Reading took too long. Try a clearer or smaller photo.', AI_FAILED: 'The invoice could not be read. Try a clearer photo in good light.' },
   },
   cust: {
+    language: 'Language for reminders and pay link',
     title: 'Customers', add: 'Add customer', name: 'Business name', contact: 'Contact person', phone: 'Phone', email: 'Email', address: 'Address', city: 'City', state: 'State', gstin: 'GSTIN', gstinHelp: 'Leave empty if the customer is not GST-registered',
     gstinValid: 'Valid GSTIN · {state}', gstinInvalid: 'This GSTIN is not valid. Check all 15 characters.', creditDays: 'Credit days', owed: 'Total owed', overdue: 'Overdue', avgLate: 'Average days late', onTime: 'Paid on time', grade: 'Reliability',
     unregistered: 'Not GST-registered', otherState: 'Other state',
@@ -86,7 +87,7 @@ export default {
     demand: 'Amount demanded', payBy: 'Please pay by', howToPay: 'How to pay', bank: 'Bank', accName: 'Account name', accNo: 'Account number', ifsc: 'IFSC', upi: 'UPI ID', scan: 'Scan to pay by UPI',
     dispute: 'If you think any amount is wrong, please contact {name} at {phone} or {email} before the date above.', closing: 'We value our business with you and look forward to your payment.', regards: 'Yours sincerely,', sign: 'Authorised signatory', log: 'Log as sent', logged: 'Logged on the invoice timeline',
   },
-  pay: { title: 'Invoice from {biz}', amountOwed: 'Amount owed', dueOn: 'Due on {d}', payUpi: 'Pay by UPI', simulated: 'This is a demo. No real money moves.', paidSim: 'Thank you. Your payment is recorded and the business will confirm it.',
+  pay: {language: 'Language',  title: 'Invoice from {biz}', amountOwed: 'Amount owed', dueOn: 'Due on {d}', payUpi: 'Pay by UPI', simulated: 'This is a demo. No real money moves.', paidSim: 'Thank you. Your payment is recorded and the business will confirm it.',
     already: "I've already paid", reference: 'Payment reference number', paidOn: 'Date paid', submit: 'Send', wrong: "Something's wrong with this invoice", wrongReason: 'What is wrong?', thanks: 'Thank you. {biz} has been told and will get back to you.', invalid: 'This payment link is not valid.', paidFull: 'This invoice is fully paid. Thank you.' },
   inbox: { title: 'Inbox', intro: 'Disputes and "already paid" claims from customers. Reminders stay paused until you resolve them.', DISPUTE: 'Dispute', PAID_CLAIM: 'Says already paid', creditNote: 'Accept: issue credit note for', markPaid: 'Accept: mark as paid', reject: 'Reject with reply', editInvoice: 'Edit the invoice', doneEditing: 'Mark resolved after editing', replyPh: 'Your reply to the customer', none: 'No open customer replies.', ref: 'Reference {r}, paid on {d}', resolved: 'Resolved' },
   pmt: { title: 'Payments', intro: 'Import your bank statement or add a payment. Baaki suggests a match; nothing is marked paid until you confirm.', import: 'Import bank-statement.csv', importSample: 'Import the sample statement', chooseFile: 'Choose a CSV file', addManual: 'Add a payment by hand', reference: 'Reference', description: 'Description',
@@ -100,6 +101,7 @@ export default {
     cover: 'Collect these to cover the gap', disputed: '{amt} in disputed invoices is left out.', totals: '13-week totals' },
   docs: { title: 'Documents', intro: 'Everything for each invoice in one place: the invoice, letters, reminders, payments and customer replies.', evidence: 'Download evidence pack', items: '{n} records' },
   set: {
+    docLang: 'Second language on invoices and letters', docLangHelp: 'Invoices and Payment Demand Letters are in English. Pick a language to print it in small text under each heading.', docLangNone: 'None (English only)',
     title: 'Settings', profile: 'Business profile', name: 'Business name', owner: 'Owner', address: 'Address', city: 'City', state: 'State', gstin: 'GSTIN', regType: 'Registration type', REGULAR: 'Regular GST', COMPOSITION: 'Composition', UNREGISTERED: 'Not registered',
     turnover: 'Annual turnover (₹)', udyam: 'Udyam-registered micro or small enterprise', udyamNo: 'Udyam number', category: 'Category', MICRO: 'Micro', SMALL: 'Small', MEDIUM: 'Medium',
     bank: 'Bank name', accName: 'Account name', accNo: 'Account number', ifsc: 'IFSC', upi: 'UPI ID', phone: 'Phone', email: 'Email', logo: 'Logo', cash: 'Opening cash in bank (₹)', buffer: 'Safety buffer (₹)',
@@ -116,5 +118,6 @@ export default {
     notConfigured: 'Email is not set up yet. Add MAIL_PROVIDER, MAIL_FROM and the key to .env (see .env.example), then restart.',
     failed: '{n} emails failed. Retry them:', retry: 'Retry', sentToday: '{n} emails sent today',
   },
+  doc: { TAX_INVOICE: 'Tax Invoice', BILL_OF_SUPPLY: 'Bill of Supply', INVOICE: 'Invoice', composition: 'Composition taxable person, not eligible to collect tax on supplies', number: 'Invoice no.', date: 'Invoice date', due: 'Due date', state: 'State', phone: 'Phone', billTo: 'Bill to', unregistered: 'Unregistered', pos: 'Place of supply', reverse: 'Tax payable on reverse charge', delivery: 'Delivery address', sr: '#', desc: 'Description', hsn: 'HSN/SAC', qty: 'Qty', rate: 'Rate', discount: 'Discount', taxable: 'Taxable value', total: 'Total', words: 'Amount in words', payTo: 'Pay to', scan: 'Scan to pay', roundOff: 'Round off', forBiz: 'For {biz}', sign: 'Authorised signatory', eInvoice: 'Turnover above ₹5 crore: e-invoice (IRN) required from the government portal. Not generated by this app.' },
   invView: { title: 'Invoice', pay: 'Pay this invoice' },
 };
