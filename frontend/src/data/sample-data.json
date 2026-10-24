@@ -24,7 +24,8 @@
    "address": "Plot 14, MIDC Bhosari, Pune 411026",
    "stateCode": "27",
    "gstin": "27AADCD3311K1ZV",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "en"
   },
   {
    "id": 2,
@@ -36,7 +37,8 @@
    "address": "204 Lotus House, Andheri East, Mumbai 400069",
    "stateCode": "27",
    "gstin": "27AAFFK7720M1ZZ",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "en"
   },
   {
    "id": 3,
@@ -48,7 +50,8 @@
    "address": "Gat 88, Dindori Road, Nashik 422004",
    "stateCode": "27",
    "gstin": "27AAGFP5150B1ZK",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "mr"
   },
   {
    "id": 4,
@@ -60,7 +63,8 @@
    "address": "Shop 7, Budhwar Peth, Pune 411002",
    "stateCode": "27",
    "gstin": "27AAIPJ6643C1ZT",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "en"
   },
   {
    "id": 5,
@@ -72,7 +76,8 @@
    "address": "12 Laxmi Road, Pune 411030",
    "stateCode": "27",
    "gstin": "27ABJPG2290D1ZW",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "mr"
   },
   {
    "id": 6,
@@ -84,7 +89,8 @@
    "address": "Ring Road Textile Market, Surat 395002",
    "stateCode": "24",
    "gstin": "24AAHFM8812E1ZF",
-   "creditDays": 45
+   "creditDays": 45,
+   "preferredLanguage": "en"
   },
   {
    "id": 7,
@@ -96,7 +102,8 @@
    "address": "Powai Naka, Satara 415001",
    "stateCode": "27",
    "gstin": null,
-   "creditDays": 15
+   "creditDays": 15,
+   "preferredLanguage": "mr"
   },
   {
    "id": 8,
@@ -108,7 +115,8 @@
    "address": "MIDC Area, Baramati 413133",
    "stateCode": "27",
    "gstin": "27AAKFP4471F1Z2",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "mr"
   },
   {
    "id": 9,
@@ -120,7 +128,8 @@
    "address": "Survey 210, Chakan MIDC, Pune 410501",
    "stateCode": "27",
    "gstin": "27AALCB9034G1ZI",
-   "creditDays": 45
+   "creditDays": 45,
+   "preferredLanguage": "en"
   },
   {
    "id": 10,
@@ -132,7 +141,8 @@
    "address": "Wagle Estate, Thane 400604",
    "stateCode": "27",
    "gstin": "27AAMFN3368H1ZW",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "en"
   },
   {
    "id": 11,
@@ -144,7 +154,8 @@
    "address": "Shahupuri, Kolhapur 416001",
    "stateCode": "27",
    "gstin": "27AANFR5527J1ZP",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "mr"
   },
   {
    "id": 12,
@@ -156,7 +167,8 @@
    "address": "Waluj MIDC, Chhatrapati Sambhajinagar 431136",
    "stateCode": "27",
    "gstin": "27AAPFJ1185L1ZT",
-   "creditDays": 30
+   "creditDays": 30,
+   "preferredLanguage": "hi"
   }
  ],
  "invoices": [
