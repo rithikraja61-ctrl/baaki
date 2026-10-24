@@ -63,3 +63,15 @@ Baaki does not do this yet. These are the five templates we would submit. They u
 5. `payment_received`: Hello {{1}}, we have received {{2}} against invoice {{3}}. Thank you for your payment. Questions? Contact {{4}}, {{5}}, on {{6}}.
 
 Payment Demand Letters would still never be sent by template. The owner sends them by hand.
+
+## Add an existing invoice from a photo (AI)
+
+New invoice → **Add an existing invoice from a photo**. Take a photo or choose a JPG, PNG or PDF of up to 5 MB.
+
+- The browser sends the file to `POST /api/invoices/scan`. The backend calls Google Gemini with the key in `AI_API_KEY`, so the key never reaches the frontend. Get a key at https://aistudio.google.com/apikey and put it in `.env` (see `.env.example`), then run `docker compose up -d --build backend`.
+- The file is held in memory only. It is never written to disk or the database, and it is wiped after reading.
+- The AI reads the invoice number, date, customer, GSTIN, items, HSN/SAC, quantities, rates, taxable value, CGST/SGST/IGST, round-off, total and any printed due date.
+- Baaki then checks the result. It validates the GSTIN check digits, recalculates GST from the items with the same calculator used for saving, compares that with the printed totals (₹1 tolerance), and matches the customer by GSTIN, then by name. It also flags duplicate invoice numbers, GST rates that are not current, and short HSN codes.
+- The New invoice form is filled in for review. Every field the AI was unsure of, or that failed a check, is highlighted. Saving stays locked until every highlight is cleared and the owner ticks "I have compared every field". The saved invoice keeps its original number and printed due date.
+
+Code: `backend/.../scan/` (GeminiReader, InvoiceScanService), `web/ScanController.java`, `frontend/src/components/ScanInvoice.jsx`. Tests: `InvoiceScanTest`.
