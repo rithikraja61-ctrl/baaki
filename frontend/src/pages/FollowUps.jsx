@@ -53,7 +53,7 @@ function FollowUpCard({ f, onDone }) {
       <ErrorBox error={err} />
       {f.stage === 'FINAL' && <Notice tone="warn">☎ {t('fu.callPrompt')} <a className="underline" href={`tel:${f.phone}`}>{f.phone}</a></Notice>}
       {f.stage === 'NEXT_STEPS' && <div className="my-2"><NextSteps /></div>}
-      <label className="label mt-3" htmlFor={`msg-${f.customerId}-${f.stage}`}>Message</label>
+      <label className="label mt-3" htmlFor={`msg-${f.customerId}-${f.stage}`}>{t('common.message')}</label>
       <textarea id={`msg-${f.customerId}-${f.stage}`} readOnly className="input min-h-[120px] py-2" value={message} />
       {done ? <Notice tone="ok">✓ {t('fu.sent')}</Notice> : (
         <>
@@ -95,7 +95,7 @@ export default function FollowUps() {
           ))}</ul>
         </section>
       )}
-      <button className="btn-secondary mt-4" onClick={reload}>↻</button>
+      <button className="btn-secondary mt-4" onClick={reload}>↻ {t('common.refresh')}</button>
     </div>
   );
 }
