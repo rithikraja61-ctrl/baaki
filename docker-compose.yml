@@ -1,3 +1,5 @@
+# Everything runs in Docker: MySQL, Spring Boot API (built + tested with Java 21 inside Docker) and the React app.
+#   docker compose up -d --build        -> app on http://localhost:5190, API on http://localhost:8090
 services:
   mysql:
     image: mysql:8.0
@@ -10,12 +12,35 @@ services:
       TZ: Asia/Kolkata
     command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
     ports:
-      - "3307:3306"   # 3306 is taken by the local MySQL80 service
+      - "3310:3306"   # 3306 = local MySQL80, 3307 = another project
     volumes:
       - baaki-mysql:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ubaaki", "-pbaaki"]
       interval: 5s
       retries: 30
+
+  backend:
+    build: ./backend
+    container_name: baaki-backend
+    environment:
+      TZ: Asia/Kolkata
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/baaki?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Kolkata&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: baaki
+      SPRING_DATASOURCE_PASSWORD: baaki
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8090:8080"   # 8080 is used by another project
+
+  frontend:
+    build: ./frontend
+    container_name: baaki-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5190:80"
+
 volumes:
   baaki-mysql:
