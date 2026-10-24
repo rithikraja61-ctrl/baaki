@@ -4,7 +4,7 @@ import { api } from '../api/client.js';
 import { useApp, useLoad } from '../lib/AppContext.jsx';
 import { addDays, fmtDate, money } from '../lib/format.js';
 import { fillTemplate } from '../data/templates.js';
-import { ErrorBox, Loading, Notice, PageTitle } from '../components/ui.jsx';
+import { ErrorBox, LangPicker, Loading, Notice, PageTitle } from '../components/ui.jsx';
 
 export function NextSteps() {
   const { t, profile } = useApp();
@@ -22,7 +22,7 @@ export function NextSteps() {
 
 function FollowUpCard({ f, onDone }) {
   const { t, lang, profile, today } = useApp();
-  const [msgLang, setMsgLang] = useState(lang);
+  const [msgLang, setMsgLang] = useState(f.language || 'en'); // customer's preferred language
   const [err, setErr] = useState(null);
   const [date, setDate] = useState(addDays(today, 3));
   const [done, setDone] = useState(false);
@@ -41,14 +41,14 @@ function FollowUpCard({ f, onDone }) {
   return (
     <li className="card">
       <div className="flex flex-wrap justify-between gap-2">
-        <div>
+        <div className="min-w-0">
           <h2 className="font-bold text-lg">{f.customerName}</h2>
           <div className="font-semibold text-brand-800">{t('fu.stage.' + f.stage)}</div>
           <div className="text-sm muted">{f.invoices.map((i) => i.invoiceNumber).join(', ')} · {money(f.totalPaise)} · {f.maxDaysOverdue > 0 ? `${f.maxDaysOverdue} ${t('common.days')}` : fmtDate(f.invoices[0].dueDate, lang)}</div>
         </div>
         <div>
           <label className="label text-sm" htmlFor={`ml-${f.customerId}-${f.stage}`}>{t('fu.language')}</label>
-          <select id={`ml-${f.customerId}-${f.stage}`} className="input" value={msgLang} onChange={(e) => setMsgLang(e.target.value)}><option value="en">English</option><option value="hi">हिंदी</option></select>
+          <LangPicker id={`ml-${f.customerId}-${f.stage}`} value={msgLang} onChange={setMsgLang} />
         </div>
       </div>
       <ErrorBox error={err} />
