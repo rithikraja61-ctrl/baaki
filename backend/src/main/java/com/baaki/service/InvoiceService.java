@@ -114,7 +114,8 @@ public class InvoiceService {
                           Long discountPaise, Integer gstRateBp) {}
 
     public record InvoiceReq(Long customerId, LocalDate invoiceDate, String placeOfSupply, Boolean reverseCharge,
-                             String deliveryAddress, String notes, List<LineReq> lines, Boolean send) {}
+                             String deliveryAddress, String notes, List<LineReq> lines, Boolean send,
+                             String existingNumber, LocalDate dueDate) {}
 
     public static GstCalculator.DocType docTypeFor(String registrationType) {
         return switch (registrationType == null ? "REGULAR" : registrationType) {
@@ -188,7 +189,16 @@ public class InvoiceService {
         boolean wasDraft = isNew || "DRAFT".equals(i.status);
         i.customerId = c.id;
         i.invoiceDate = r.invoiceDate() == null ? today : r.invoiceDate();
-        i.dueDate = i.invoiceDate.plusDays(c.creditDays);
+        i.dueDate = r.dueDate() != null ? r.dueDate() : i.invoiceDate.plusDays(c.creditDays);
+        if (i.dueDate.isBefore(i.invoiceDate)) throw new IllegalArgumentException("The due date cannot be before the invoice date");
+        String existingNo = blankToNull(r.existingNumber());
+        if (existingNo != null && wasDraft) { // an old paper/PDF invoice keeps its own number
+            existingNo = existingNo.trim().toUpperCase();
+            if (existingNo.length() > 16) throw new IllegalArgumentException("Invoice number can be at most 16 characters");
+            Invoice other = invoices.findByInvoiceNumber(existingNo).orElse(null);
+            if (other != null && !other.id.equals(i.id)) throw new IllegalArgumentException("Invoice number " + existingNo + " is already in Baaki");
+            i.invoiceNumber = existingNo;
+        }
         i.placeOfSupply = pos;
         i.docType = dt.name();
         i.reverseCharge = Boolean.TRUE.equals(r.reverseCharge());
@@ -212,7 +222,7 @@ public class InvoiceService {
         }
         LocalDateTime now = LocalDateTime.now(clock);
         events.save(new InvoiceEvent(i.id, c.id, now, isNew ? "CREATED" : "EDITED", null, null,
-                isNew ? "Invoice created" : "Invoice edited"));
+                isNew ? (existingNo != null ? "Existing invoice " + existingNo + " added from a photo, checked by the owner" : "Invoice created") : "Invoice edited"));
         if (wasDraft && Boolean.TRUE.equals(r.send())) send(i, now);
         else if (!wasDraft && i.totalPaise <= paidAndCredited(i.id)) i.status = "PAID";
         invoices.save(i);
@@ -229,7 +239,7 @@ public class InvoiceService {
     }
 
     private void send(Invoice i, LocalDateTime now) {
-        i.invoiceNumber = numbers.next("INV", i.invoiceDate);
+        if (i.invoiceNumber == null) i.invoiceNumber = numbers.next("INV", i.invoiceDate);
         i.status = "SENT";
         i.sentAt = now;
         events.save(new InvoiceEvent(i.id, i.customerId, now, "SENT", null, null, "Invoice " + i.invoiceNumber + " sent"));
