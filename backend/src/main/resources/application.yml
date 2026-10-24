@@ -17,6 +17,11 @@ spring:
     clean-disabled: false   # needed for "Reset demo"
   jackson:
     time-zone: Asia/Kolkata
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+      file-size-threshold: 7MB   # keep uploads in memory only: invoice photos are never written to disk
 baaki:
   # GST rates in basis points (1800 = 18%). 0/5/18% are the main slabs since 22 Sep 2025, plus 3% and 40%.
   # Check current rates on cbic-gst.gov.in before relying on them.
@@ -35,3 +40,9 @@ baaki:
     public-base-url: ${PUBLIC_BASE_URL:http://localhost:5190}   # used to build invoice and pay links
   auto-send:
     cron: "0 0 10 * * *"                     # every day at 10:00, zone Asia/Kolkata
+  # Reading existing invoices from a photo or PDF. The key comes from AI_API_KEY (see .env.example), never from this file.
+  ai:
+    provider: gemini
+    api-key: ${AI_API_KEY:}
+    model: ${AI_MODEL:gemini-flash-latest}
+    timeout-seconds: 60
