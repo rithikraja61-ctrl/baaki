@@ -14,8 +14,9 @@ export default function Invoices() {
   const [status, setStatus] = useState('');
   const [due, setDue] = useState('');
   const [od, setOd] = useState('');
-  const customers = useMemo(() => [...new Map((data || []).map((i) => [i.customerId, i.customerName])).entries()].sort((a, b) => a[1].localeCompare(b[1])), [data]);
-  const rows = useMemo(() => (data || []).filter((i) => {
+  const list = Array.isArray(data) ? data : [];
+  const customers = useMemo(() => [...new Map(list.map((i) => [i.customerId, i.customerName])).entries()].sort((a, b) => a[1].localeCompare(b[1])), [list]);
+  const rows = useMemo(() => list.filter((i) => {
     if (q && !(`${i.invoiceNumber || ''} ${i.customerName}`.toLowerCase().includes(q.toLowerCase()))) return false;
     if (cust && String(i.customerId) !== cust) return false;
     if (status && i.status !== status) return false;

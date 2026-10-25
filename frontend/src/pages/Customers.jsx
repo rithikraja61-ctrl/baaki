@@ -92,7 +92,7 @@ export default function Customers() {
       <PageTitle actions={<button className="btn-primary" onClick={() => setEditing({})}>+ {t('cust.add')}</button>}>{t('cust.title')}</PageTitle>
       {editing && <section className="card mb-4"><CustomerForm initial={editing.id ? { ...editing, gstin: editing.gstin || '' } : null} onSaved={() => { setEditing(null); reload(); }} onCancel={() => setEditing(null)} /></section>}
       <ul className="grid md:grid-cols-2 gap-3">
-        {data.map((c) => (
+        {(Array.isArray(data) ? data : []).map((c) => (
           <li key={c.id} className="card">
             <div className="flex items-start gap-3">
               <Grade grade={c.reliability.grade} />
