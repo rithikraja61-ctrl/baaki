@@ -7,12 +7,12 @@ databases:
     region: oregon
 
 services:
-  # Backend API - Spring Boot 3 on Java 21 (Docker)
+  # All-in-One: React Frontend + Spring Boot Backend in a single Docker container
   - type: web
-    name: baaki-backend
+    name: baaki
     runtime: docker
-    dockerContext: ./backend
-    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    dockerfilePath: ./Dockerfile
     plan: free
     region: oregon
     healthCheckPath: /api/config
@@ -38,28 +38,6 @@ services:
       # Google OAuth 2.0 Client ID (optional, leave empty for Demo Login)
       - key: GOOGLE_CLIENT_ID
         sync: false
-      # CORS allowed origins (Render frontend URL or custom domain)
-      - key: CORS_ALLOWED_ORIGINS
-        sync: false
       # Public URL for invoice pay links
       - key: PUBLIC_BASE_URL
-        sync: false
-
-  # Frontend Web App - Vite + React (Static Site)
-  - type: web
-    name: baaki-frontend
-    runtime: static
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    plan: free
-    region: oregon
-    routes:
-      # Single-Page Application (SPA) client-side routing
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      # Connects frontend to the backend URL on Render (e.g. https://baaki-backend.onrender.com/api)
-      - key: VITE_API_BASE_URL
         sync: false

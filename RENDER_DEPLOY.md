@@ -1,86 +1,63 @@
-# Deploying Baaki on Render (with Free Managed PostgreSQL)
+# Deploying Baaki on Render (Single All-in-One Docker Container)
 
-This guide explains how to deploy **Baaki** (Frontend, Backend, and Database) to [Render](https://render.com) using their **100% Free** tier.
+Baaki is configured to run as a **single, unified Docker container** that bundles both the React frontend and Spring Boot backend together, connected to Render's **Free Managed PostgreSQL** database.
 
 ---
 
-## Architecture Overview
-
-- **Database**: Render Managed PostgreSQL (Free)
-- **Backend**: Render Web Service running Spring Boot 3 + Java 21 with `SPRING_PROFILES_ACTIVE=postgres` (Free)
-- **Frontend**: Render Static Site running Vite + React SPA (Free)
-
-*(Note: Local development with `docker-compose` continues to run with MySQL as default, while Render runs with PostgreSQL via the `postgres` Spring profile!)*
+## Why Single Container on Render?
+- **100% Free**: Fits perfectly within Render's free tier (1 free Web Service + 1 free PostgreSQL database).
+- **Same Origin / No CORS**: Frontend and API run on the exact same domain (`https://your-app.onrender.com`), eliminating CORS headaches and network latency.
+- **Single URL**: One clean URL for your dashboard, customer invoice views, pay links, and API.
 
 ---
 
 ## Method 1: 1-Click Blueprint Deploy (Recommended)
 
-Render Blueprints automatically creates the PostgreSQL database, backend service, and frontend static site all together.
-
-1. **Push your code to GitHub**:
+1. **Commit and push** to your GitHub repository:
    ```bash
    git add .
-   git commit -m "Add PostgreSQL profile and Render blueprint"
+   git commit -m "Configure all-in-one Docker deployment for Render"
    git push origin main
    ```
 
 2. **Open Render**:
    - Go to [dashboard.render.com](https://dashboard.render.com/).
    - Click **New +** -> **Blueprint**.
-   - Select your `baaki` repository.
+   - Connect your **`baaki`** repository.
 
-3. **Render will auto-configure**:
-   - Database: `baaki-db` (PostgreSQL)
-   - Backend: `baaki-backend` (Docker container with `postgres` profile)
-   - Frontend: `baaki-frontend` (Static Site with SPA rewrites)
+3. **Render will auto-detect `render.yaml`**:
+   - Creates the **`baaki-db`** (PostgreSQL)
+   - Creates the **`baaki`** Web Service (Unified Docker Container)
+   - Automatically connects them via `DATABASE_URL`.
 
-4. **Variables to fill in**:
-   - `AI_API_KEY`: Your Google Gemini API key (for invoice scanning).
-   - `VITE_API_BASE_URL`: `https://baaki-backend.onrender.com/api` (replace with your actual backend name).
+4. **Variables to enter**:
+   - `AI_API_KEY`: Your Google Gemini API key (for invoice photo/PDF scanning).
 
-5. Click **Apply**! Render will deploy all 3 services automatically.
+5. Click **Apply**. Render will build the React frontend, package the Spring Boot backend, run Flyway migrations, and launch your application!
 
 ---
 
-## Method 2: Manual Setup (Step-by-Step)
+## Method 2: Manual Web Service Setup (Alternative)
 
-If you prefer setting up services individually:
+If setting up without blueprints:
 
-### Step 1: Create PostgreSQL Database
+### 1. Create Free PostgreSQL Database
 1. In Render, click **New +** -> **PostgreSQL**.
 2. Name: `baaki-db`, Database: `baaki`, User: `baaki`.
-3. Instance Type: **Free**.
-4. Click **Create Database**.
-5. Once created, copy the **Internal Database URL** (e.g., `postgres://baaki:...@dpg-...:5432/baaki`).
+3. Plan: **Free**.
+4. Click **Create Database**, then copy the **Internal Database URL**.
 
-### Step 2: Deploy Backend Web Service
+### 2. Create All-in-One Web Service
 1. Click **New +** -> **Web Service**.
 2. Select your repository.
 3. Configure:
-   - **Name**: `baaki-backend`
-   - **Root Directory**: `backend`
+   - **Name**: `baaki`
    - **Runtime**: `Docker`
-   - **Instance Type**: `Free`
-4. In **Environment Variables**:
+   - **Dockerfile Path**: `./Dockerfile`
+   - **Plan**: `Free`
+4. Environment Variables:
    - `SPRING_PROFILES_ACTIVE`: `postgres`
    - `DATABASE_URL`: *(paste the Internal Database URL from Step 1)*
-   - `AI_API_KEY`: *(your Gemini key)*
+   - `AI_API_KEY`: *(your Gemini API key)*
    - `MAIL_PROVIDER`: `none`
-   - `CORS_ALLOWED_ORIGINS`: `https://baaki-frontend.onrender.com`
-   - `PUBLIC_BASE_URL`: `https://baaki-frontend.onrender.com`
-
-### Step 3: Deploy Frontend Static Site
-1. Click **New +** -> **Static Site**.
-2. Select your repository.
-3. Configure:
-   - **Name**: `baaki-frontend`
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm install && npm run build`
-   - **Publish Directory**: `dist`
-4. Under **Redirects / Rewrites**, click **Add Rule**:
-   - **Type**: `Rewrite`
-   - **Source**: `/*`
-   - **Destination**: `/index.html`
-5. In **Environment Variables**:
-   - `VITE_API_BASE_URL`: `https://baaki-backend.onrender.com/api`
+   - `PUBLIC_BASE_URL`: `https://baaki.onrender.com` (replace with your Render web service URL)
