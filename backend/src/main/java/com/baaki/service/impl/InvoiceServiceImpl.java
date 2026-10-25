@@ -40,15 +40,19 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final SnapshotService snapshots;
     private final BaakiProperties props;
     private final Clock clock;
+    private final EmailSender emailSender;
+    private final MailProperties mail;
 
     public InvoiceServiceImpl(InvoiceRepository invoices, InvoiceLineRepository lines, CustomerRepository customers,
                           BusinessProfileRepository profiles, InvoiceEventRepository events,
                           PaymentAllocationRepository allocations, PaymentRepository payments,
                           CreditNoteRepository creditNotes, InboxItemRepository inbox, InvoiceNumberService numbers,
-                          SnapshotService snapshots, BaakiProperties props, Clock clock) {
+                          SnapshotService snapshots, BaakiProperties props, Clock clock,
+                          EmailSender emailSender, MailProperties mail) {
         this.invoices = invoices; this.lines = lines; this.customers = customers; this.profiles = profiles;
         this.events = events; this.allocations = allocations; this.payments = payments; this.creditNotes = creditNotes;
         this.inbox = inbox; this.numbers = numbers; this.snapshots = snapshots; this.props = props; this.clock = clock;
+        this.emailSender = emailSender; this.mail = mail;
     }
 
     // ---------- views ----------
@@ -239,6 +243,29 @@ public class InvoiceServiceImpl implements InvoiceService {
         i.status = "SENT";
         i.sentAt = now;
         events.save(new InvoiceEvent(i.id, i.customerId, now, "SENT", null, null, "Invoice " + i.invoiceNumber + " sent"));
+
+        if (emailSender.configured()) {
+            BusinessProfile p = profiles.findById(1L).orElse(null);
+            Customer c = customers.findById(i.customerId).orElse(null);
+            if (p != null && c != null) {
+                List<InvoiceLine> invoiceLines = lines.findByInvoiceIdOrderByLineNo(i.id);
+                InvoiceEmailComposer.Email email = InvoiceEmailComposer.compose(
+                        p, c, i, invoiceLines, mail.publicBaseUrl(), p.autoSendTestMode);
+                if (email.recipient() != null && !email.recipient().isBlank()) {
+                    try {
+                        String idempKey = "baaki-inv-" + i.id + "-" + System.currentTimeMillis();
+                        String msgId = emailSender.send(new EmailSender.OutgoingEmail(
+                                p.name, email.recipient(), ReminderComposer.contactEmail(p),
+                                email.subject(), email.text(), email.html(), idempKey));
+                        events.save(new InvoiceEvent(i.id, i.customerId, now, "SENT", "EMAIL", "RESEND",
+                                "Invoice emailed to " + email.recipient() + " (msg: " + msgId + ")"));
+                    } catch (Exception ex) {
+                        events.save(new InvoiceEvent(i.id, i.customerId, now, "SENT", "EMAIL", "FAILED",
+                                "Failed to email invoice: " + ex.getMessage()));
+                    }
+                }
+            }
+        }
     }
 
     @Transactional
