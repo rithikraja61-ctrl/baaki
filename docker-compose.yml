@@ -36,6 +36,8 @@ services:
       # Reading invoices from photos (Gemini). Empty key = the feature shows a setup message.
       AI_API_KEY: ${AI_API_KEY:-}
       AI_MODEL: ${AI_MODEL:-gemini-flash-latest}
+      # Google OAuth Sign-In Client ID
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       SPRING_MAIL_HOST: ${SMTP_HOST:-}
       SPRING_MAIL_PORT: ${SMTP_PORT:-587}
       SPRING_MAIL_USERNAME: ${SMTP_USERNAME:-}

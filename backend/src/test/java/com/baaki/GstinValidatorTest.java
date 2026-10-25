@@ -1,6 +1,6 @@
 package com.baaki;
 
-import com.baaki.money.GstinValidator;
+import com.baaki.service.GstinValidator;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

@@ -1,10 +1,18 @@
 async function request(method, path, body, contentType = 'application/json') {
   const opts = { method, headers: {} };
+  const token = localStorage.getItem('baaki.auth.token');
+  if (token) {
+    opts.headers['Authorization'] = `Bearer ${token}`;
+  }
   if (body !== undefined) {
     opts.headers['Content-Type'] = contentType;
     opts.body = contentType === 'application/json' ? JSON.stringify(body) : body;
   }
   const res = await fetch('/api' + path, opts);
+  if (res.status === 401 && !path.startsWith('/auth/')) {
+    localStorage.removeItem('baaki.auth.token');
+    window.dispatchEvent(new CustomEvent('baaki:auth-expired'));
+  }
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
   if (!res.ok) throw new Error((data && data.error) || `Request failed (${res.status})`);

@@ -1,8 +1,8 @@
 package com.baaki;
 
-import com.baaki.scan.InvoiceScanService;
-import com.baaki.scan.ScanException;
-import com.baaki.scan.ScanResult;
+import com.baaki.service.InvoiceScanService;
+import com.baaki.exception.ScanException;
+import com.baaki.dto.ScanResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;

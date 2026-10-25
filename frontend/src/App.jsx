@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import Layout from './components/Layout.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
+import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Invoices from './pages/Invoices.jsx';
 import InvoiceDetail from './pages/InvoiceDetail.jsx';
@@ -21,12 +23,16 @@ import InvoiceView from './pages/InvoiceView.jsx';
 export default function App() {
   return (
     <Routes>
+      {/* Public customer-facing and auth routes */}
+      <Route path="/login" element={<Login />} />
       <Route path="/pay/:token" element={<PayLink />} />
       <Route path="/invoice/:token" element={<InvoiceView />} />
       <Route path="/invoices/:id/print" element={<InvoicePrint />} />
       <Route path="/letters/demand" element={<DemandLetter />} />
       <Route path="/documents/:id/evidence" element={<EvidencePack />} />
-      <Route element={<Layout />}>
+
+      {/* Protected application routes */}
+      <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<Dashboard />} />
         <Route path="invoices" element={<Invoices />} />
         <Route path="invoices/new" element={<NewInvoice />} />

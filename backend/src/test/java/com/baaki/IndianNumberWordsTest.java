@@ -1,7 +1,7 @@
 package com.baaki;
 
-import com.baaki.money.IndianNumberWords;
-import com.baaki.money.Money;
+import com.baaki.service.IndianNumberWords;
+import com.baaki.service.Money;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

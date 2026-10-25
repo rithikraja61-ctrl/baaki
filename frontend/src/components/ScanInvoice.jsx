@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { api } from '../api/client.js';
 import { useApp } from '../lib/AppContext.jsx';
 import { money } from '../lib/format.js';
 
@@ -13,7 +14,11 @@ export function ScanUpload({ onResult }) {
   const [err, setErr] = useState('');
   const cam = useRef(null);
   const pick = useRef(null);
-  useEffect(() => { fetch('/api/invoices/scan/status').then((r) => r.json()).then(setStatus).catch(() => setStatus(null)); }, []);
+  useEffect(() => {
+    api.get('/invoices/scan/status')
+      .then(setStatus)
+      .catch(() => setStatus(null));
+  }, []);
 
   const send = async (file) => {
     setErr('');
@@ -24,7 +29,10 @@ export function ScanUpload({ onResult }) {
     try {
       const fd = new FormData();
       fd.append('file', file);
-      const res = await fetch('/api/invoices/scan', { method: 'POST', body: fd });
+      const headers = {};
+      const token = localStorage.getItem('baaki.auth.token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetch('/api/invoices/scan', { method: 'POST', headers, body: fd });
       const text = await res.text();
       const data = text ? JSON.parse(text) : null;
       if (!res.ok) { setErr(t(`scan.err.${data?.code || 'AI_FAILED'}`)); return; }

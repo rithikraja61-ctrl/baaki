@@ -1,7 +1,7 @@
 package com.baaki;
 
-import com.baaki.domain.LadderStage;
-import com.baaki.money.MsmeInterest;
+import com.baaki.model.LadderStage;
+import com.baaki.service.MsmeInterest;
 import com.baaki.service.ChaseService;
 import com.baaki.service.LadderService;
 import com.baaki.service.ReliabilityCalculator;

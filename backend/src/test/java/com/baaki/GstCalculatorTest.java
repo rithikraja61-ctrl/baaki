@@ -1,8 +1,8 @@
 package com.baaki;
 
-import com.baaki.money.GstCalculator;
-import com.baaki.money.GstCalculator.DocType;
-import com.baaki.money.GstCalculator.LineInput;
+import com.baaki.service.GstCalculator;
+import com.baaki.service.GstCalculator.DocType;
+import com.baaki.service.GstCalculator.LineInput;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

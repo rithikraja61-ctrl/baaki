@@ -1,10 +1,10 @@
 package com.baaki;
 
-import com.baaki.autosend.AutoSendRules;
-import com.baaki.autosend.ReminderComposer;
-import com.baaki.autosend.ReminderTemplates;
-import com.baaki.domain.BusinessProfile;
-import com.baaki.domain.LadderStage;
+import com.baaki.service.AutoSendRules;
+import com.baaki.service.ReminderComposer;
+import com.baaki.service.ReminderTemplates;
+import com.baaki.model.BusinessProfile;
+import com.baaki.model.LadderStage;
 import com.baaki.service.LadderService.FollowUp;
 import com.baaki.service.LadderService.FollowUpInvoice;
 import org.junit.jupiter.api.Test;

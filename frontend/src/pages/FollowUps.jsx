@@ -27,16 +27,17 @@ function FollowUpCard({ f, onDone }) {
   const [date, setDate] = useState(addDays(today, 3));
   const [done, setDone] = useState(false);
   const origin = window.location.origin;
+  const firstDueDate = f.invoices?.[0]?.dueDate ? fmtDate(f.invoices[0].dueDate, msgLang) : '';
   const message = fillTemplate(msgLang, f.stage, {
     contact: f.contactPerson || f.customerName, customer: f.customerName, business: profile?.name,
-    invoices: f.invoices.map((i) => i.invoiceNumber).join(', '), amount: money(f.totalPaise),
-    days: Math.max(0, f.maxDaysOverdue), dueDate: fmtDate(f.invoices[0].dueDate, msgLang),
-    link: f.invoices.map((i) => `${origin}/pay/${i.payToken}`).join(' '), owner: profile?.ownerName, phone: profile?.phone,
+    invoices: (f.invoices || []).map((i) => i.invoiceNumber).join(', '), amount: money(f.totalPaise || 0),
+    days: Math.max(0, f.maxDaysOverdue || 0), dueDate: firstDueDate,
+    link: (f.invoices || []).map((i) => `${origin}/pay/${i.payToken}`).join(' '), owner: profile?.ownerName, phone: profile?.phone,
     email: profile?.ownerEmail || profile?.email,
   });
   const phone = (f.phone || '').replace(/\D/g, '');
   const enc = encodeURIComponent(message);
-  const ids = f.invoices.map((i) => i.invoiceId);
+  const ids = (f.invoices || []).map((i) => i.invoiceId);
   const call = async (fn) => { setErr(null); try { await fn(); setDone(true); onDone(); } catch (e) { setErr(e); } };
   return (
     <li className="card">
@@ -44,7 +45,7 @@ function FollowUpCard({ f, onDone }) {
         <div className="min-w-0">
           <h2 className="font-bold text-lg">{f.customerName}</h2>
           <div className="font-semibold text-brand-800">{t('fu.stage.' + f.stage)}</div>
-          <div className="text-sm muted">{f.invoices.map((i) => i.invoiceNumber).join(', ')} · {money(f.totalPaise)} · {f.maxDaysOverdue > 0 ? `${f.maxDaysOverdue} ${t('common.days')}` : fmtDate(f.invoices[0].dueDate, lang)}</div>
+          <div className="text-sm muted">{(f.invoices || []).map((i) => i.invoiceNumber).join(', ')} · {money(f.totalPaise || 0)} · {f.maxDaysOverdue > 0 ? `${f.maxDaysOverdue} ${t('common.days')}` : (f.invoices?.[0]?.dueDate ? fmtDate(f.invoices[0].dueDate, lang) : '')}</div>
         </div>
         <div>
           <label className="label text-sm" htmlFor={`ml-${f.customerId}-${f.stage}`}>{t('fu.language')}</label>
@@ -84,17 +85,19 @@ function AutoSendPanel() {
   const [busy, setBusy] = useState(null);
   if (!data) return null;
   const retry = async (id) => { setErr(null); setBusy(id); try { await api.post(`/autosend/${id}/retry`); } catch (e) { setErr(e); } setBusy(null); reload(); };
-  const sentToday = data.today.filter((l) => l.status === 'SENT');
+  const allLogs = data.recent || data.today || [];
+  const sentToday = allLogs.filter((l) => l.status === 'SENT');
+  const failed = data.failed || allLogs.filter((l) => l.status === 'FAILED');
   return (
     <section className="card mb-4" aria-labelledby="auto-h">
       <h2 id="auto-h" className="h2">{t('auto.title')}</h2>
       <p className="muted">{data.enabled ? t('auto.on') : t('auto.off')} {data.testMode && <strong>{t('auto.testOn', { e: data.ownerEmail })}</strong>}</p>
       {!data.configured && <Notice tone="warn">{t('auto.notConfigured')}</Notice>}
       <ErrorBox error={err} />
-      {data.failed.length > 0 && (
+      {failed.length > 0 && (
         <>
-          <h3 className="font-semibold mt-3 text-red-800">{t('auto.failed', { n: data.failed.length })}</h3>
-          <ul className="divide-y">{data.failed.map((l) => (
+          <h3 className="font-semibold mt-3 text-red-800">{t('auto.failed', { n: failed.length })}</h3>
+          <ul className="divide-y">{failed.map((l) => (
             <li key={l.id} className="py-2 flex flex-wrap gap-2 items-center justify-between">
               <div className="min-w-0 break-words">
                 <div className="font-semibold">{l.customerName} · {t('fu.stage.' + l.stage)}</div>
@@ -126,9 +129,9 @@ export default function FollowUps() {
       <PageTitle>{t('fu.title')}</PageTitle>
       <p className="muted mb-4">{t('fu.intro')}</p>
       <AutoSendPanel />
-      {data.followUps.length === 0 && <Notice tone="ok">{t('fu.none')}</Notice>}
-      <ul className="space-y-4">{data.followUps.map((f) => <FollowUpCard key={`${f.customerId}-${f.stage}`} f={f} onDone={() => {}} />)}</ul>
-      {data.paused.length > 0 && (
+      {(!data.followUps || data.followUps.length === 0) && <Notice tone="ok">{t('fu.none')}</Notice>}
+      <ul className="space-y-4">{(data.followUps || []).map((f) => <FollowUpCard key={`${f.customerId}-${f.stage}`} f={f} onDone={() => {}} />)}</ul>
+      {data.paused && data.paused.length > 0 && (
         <section className="card mt-6">
           <h2 className="h2">⏸ {t('fu.paused')}</h2>
           <ul className="divide-y">{data.paused.map((p) => (

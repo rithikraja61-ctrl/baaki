@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { api } from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import en from '../i18n/en.js';
 import hi from '../i18n/hi.js';
 import mr from '../i18n/mr.js';
@@ -21,6 +22,7 @@ export function translate(lang, key, vars) {
 }
 
 export function AppProvider({ children }) {
+  const { isAuthenticated } = useAuth();
   const [lang, setLangState] = useState(() => { const l = localStorage.getItem('baaki.lang'); return DICTS[l] ? l : 'en'; });
   const [textSize, setTextSizeState] = useState(() => localStorage.getItem('baaki.textSize') || 'normal');
   const [config, setConfig] = useState(null);
@@ -28,12 +30,22 @@ export function AppProvider({ children }) {
   const [version, setVersion] = useState(0); // bump to make pages reload data
 
   const refresh = useCallback(async () => {
-    const [c, p] = await Promise.all([api.get('/config'), api.get('/settings/profile')]);
-    setConfig(c);
-    setProfile(p);
-    if (p.language && !localStorage.getItem('baaki.lang')) setLangState(p.language);
+    try {
+      const c = await api.get('/config');
+      setConfig(c);
+    } catch {}
+
+    if (isAuthenticated) {
+      try {
+        const p = await api.get('/settings/profile');
+        setProfile(p);
+        if (p.language && !localStorage.getItem('baaki.lang')) setLangState(p.language);
+      } catch {}
+    } else {
+      setProfile(null);
+    }
     setVersion((v) => v + 1);
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => { refresh().catch(() => {}); }, [refresh]);
 

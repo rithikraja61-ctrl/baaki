@@ -1,7 +1,10 @@
 package com.baaki;
 
-import com.baaki.domain.InvoiceSequence;
-import com.baaki.repo.InvoiceSequenceRepository;
+import com.baaki.service.impl.InvoiceNumberServiceImpl;
+
+
+import com.baaki.model.InvoiceSequence;
+import com.baaki.repository.InvoiceSequenceRepository;
 import com.baaki.service.InvoiceNumberService;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +46,7 @@ class InvoiceNumberServiceTest {
     @Test
     void numbersAreConsecutiveAndNeverRepeatWithinYearAndRestartNextYear() {
         Map<String, InvoiceSequence> table = new HashMap<>();
-        InvoiceNumberService svc = new InvoiceNumberService(fakeRepo(table));
+        InvoiceNumberService svc = new InvoiceNumberServiceImpl(fakeRepo(table));
         Set<String> seen = new HashSet<>();
         for (int k = 1; k <= 50; k++) {
             String n = svc.next("INV", LocalDate.of(2026, 10, 24));
@@ -59,7 +62,7 @@ class InvoiceNumberServiceTest {
     void usesThePessimisticLockQuery() {
         Map<String, InvoiceSequence> table = new HashMap<>();
         InvoiceSequenceRepository repo = fakeRepo(table);
-        new InvoiceNumberService(repo).next("INV", LocalDate.of(2026, 10, 24));
+        new InvoiceNumberServiceImpl(repo).next("INV", LocalDate.of(2026, 10, 24));
         verify(repo, atLeastOnce()).lockByKey("INV/26-27");
     }
 }
