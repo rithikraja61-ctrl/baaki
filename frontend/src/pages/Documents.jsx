@@ -18,7 +18,7 @@ function Row({ i }) {
           <Link className="btn-primary" to={`/documents/${i.id}/evidence`}>{t('docs.evidence')}</Link>
         </div>
       </div>
-      {open && (d.data ? <div className="mt-3"><Timeline events={d.data.timeline} /></div> : <Loading />)}
+      {open && (d.data ? <div className="mt-3"><Timeline events={d.data.timeline || d.data.events || []} /></div> : <Loading />)}
     </li>
   );
 }

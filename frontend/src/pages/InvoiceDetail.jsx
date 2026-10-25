@@ -7,9 +7,10 @@ import { ErrorBox, Loading, Notice, PageTitle, StatusBadge } from '../components
 
 export function Timeline({ events }) {
   const { t, lang } = useApp();
+  const list = events || [];
   return (
     <ol className="border-l-2 border-brand-600 ml-2 space-y-3">
-      {events.map((e) => (
+      {list.map((e) => (
         <li key={e.id} className="ml-4">
           <div className="font-semibold">{t('ev.' + e.type)}{e.stage ? ` · ${t('fu.stage.' + e.stage)}` : ''}{e.channel ? ` · ${e.channel}` : ''}</div>
           <div className="text-sm muted">{fmtDate(e.eventAt, lang)} {String(e.eventAt).slice(11, 16)}</div>
@@ -62,7 +63,7 @@ export default function InvoiceDetail() {
             <h2 className="h2">{t('inv.lines')}</h2>
             <table className="table text-sm">
               <thead><tr><th>{t('newInv.description')}</th><th>{t('newInv.hsn')}</th><th className="text-right">{t('newInv.qty')}</th><th className="text-right">{t('newInv.taxable')}</th><th className="text-right">GST</th><th className="text-right">{t('common.total')}</th></tr></thead>
-              <tbody>{d.lines.map((l) => (
+              <tbody>{(d.lines || []).map((l) => (
                 <tr key={l.id}><td>{l.description}</td><td>{l.hsnSac}</td><td className="text-right">{Number(l.quantity)} {l.unit}</td><td className="text-right">{money(l.taxablePaise)}</td><td className="text-right">{rateLabel(l.gstRateBp)}</td><td className="text-right">{money(l.totalPaise)}</td></tr>
               ))}</tbody>
             </table>
@@ -89,7 +90,7 @@ export default function InvoiceDetail() {
             </section>
           )}
         </div>
-        <section className="card min-w-0"><h2 className="h2">{t('inv.timeline')}</h2><Timeline events={d.timeline} /></section>
+        <section className="card min-w-0"><h2 className="h2">{t('inv.timeline')}</h2><Timeline events={d.timeline || d.events || []} /></section>
       </div>
     </div>
   );

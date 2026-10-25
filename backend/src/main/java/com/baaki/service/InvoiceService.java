@@ -17,8 +17,8 @@ public interface InvoiceService {
     }
 
     record Detail(InvoiceSummary summary, Invoice invoice, List<InvoiceLine> lines, Customer customer,
-                  BusinessProfile profile, String qrPayload, boolean eInvoiceActive, String docTitle,
-                  boolean composition, String amountInWords, List<InvoiceEvent> events,
+                  BusinessProfile business, String placeOfSupplyName, boolean intraState, String amountInWords,
+                  boolean eInvoiceRequired, String docTitle, List<InvoiceEvent> timeline,
                   List<Map<String, Object>> payments, List<CreditNote> creditNotes, List<InboxItem> inbox) {}
 
     record LineReq(String description, String hsnSac, BigDecimal quantity, String unit, Long ratePaise,
