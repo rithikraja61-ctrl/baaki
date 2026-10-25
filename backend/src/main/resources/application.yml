@@ -15,6 +15,7 @@ spring:
       hibernate.jdbc.time_zone: Asia/Kolkata
   flyway:
     clean-disabled: false   # needed for "Reset demo"
+    locations: classpath:db/migration/mysql
   jackson:
     time-zone: Asia/Kolkata
   servlet:

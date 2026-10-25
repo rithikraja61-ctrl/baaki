@@ -33,7 +33,7 @@ class GstinValidatorTest {
     }
 
     static List<String> seedGstins() throws IOException {
-        try (InputStream in = GstinValidatorTest.class.getResourceAsStream("/db/migration/V2__seed.sql")) {
+        try (InputStream in = GstinValidatorTest.class.getResourceAsStream("/db/migration/mysql/V2__seed.sql")) {
             assertNotNull(in, "seed file on classpath");
             String sql = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             Matcher m = Pattern.compile("'(\\d{2}[A-Z]{5}\\d{4}[A-Z][1-9A-Z]Z[0-9A-Z])'").matcher(sql);
