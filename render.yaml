@@ -32,7 +32,7 @@ services:
       - key: MAIL_PROVIDER
         value: none
       - key: MAIL_FROM
-        value: reminders@yourdomain.in
+        value: onboarding@resend.dev
       - key: RESEND_API_KEY
         sync: false
       # Google OAuth 2.0 Client ID (optional, leave empty for Demo Login)
