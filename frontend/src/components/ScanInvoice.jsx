@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { api } from '../api/client.js';
+import { api, API_BASE } from '../api/client.js';
 import { useApp } from '../lib/AppContext.jsx';
 import { money } from '../lib/format.js';
 
@@ -32,7 +32,7 @@ export function ScanUpload({ onResult }) {
       const headers = {};
       const token = localStorage.getItem('baaki.auth.token');
       if (token) headers['Authorization'] = `Bearer ${token}`;
-      const res = await fetch('/api/invoices/scan', { method: 'POST', headers, body: fd });
+      const res = await fetch(`${API_BASE}/invoices/scan`, { method: 'POST', headers, body: fd });
       const text = await res.text();
       const data = text ? JSON.parse(text) : null;
       if (!res.ok) { setErr(t(`scan.err.${data?.code || 'AI_FAILED'}`)); return; }

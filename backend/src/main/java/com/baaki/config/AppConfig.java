@@ -24,9 +24,26 @@ public class AppConfig implements WebMvcConfigurer {
         return args -> repo.findById(1L).ifPresent(p -> clock.setDemoDate(p.getDemoDate()));
     }
 
+    @org.springframework.beans.factory.annotation.Value("${baaki.cors.allowed-origins:}")
+    private String customOrigins;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**").allowedOriginPatterns("http://localhost:*", "http://127.0.0.1:*")
+        java.util.List<String> origins = new java.util.ArrayList<>();
+        origins.add("http://localhost:*");
+        origins.add("http://127.0.0.1:*");
+        origins.add("https://*.onrender.com");
+        if (customOrigins != null && !customOrigins.isBlank()) {
+            for (String origin : customOrigins.split(",")) {
+                String trimmed = origin.trim();
+                if (!trimmed.isEmpty()) {
+                    origins.add(trimmed);
+                }
+            }
+        }
+
+        registry.addMapping("/api/**")
+                .allowedOriginPatterns(origins.toArray(String[]::new))
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
