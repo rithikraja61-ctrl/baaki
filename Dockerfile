@@ -10,11 +10,10 @@ RUN npm run build
 FROM maven:3.9-eclipse-temurin-21 AS backend-build
 WORKDIR /app
 COPY backend/pom.xml .
-RUN mvn -B -q dependency:go-offline
 COPY backend/src ./src
 # Embed built frontend static assets into Spring Boot's classpath
 COPY --from=frontend-build /app/dist ./src/main/resources/static
-RUN mvn -B package -DskipTests
+RUN mvn -B clean package -DskipTests
 
 # Stage 3: Lightweight Runtime Container
 FROM eclipse-temurin:21-jre
