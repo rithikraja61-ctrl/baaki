@@ -1,3 +1,11 @@
+databases:
+  # Free Managed PostgreSQL Database on Render
+  - name: baaki-db
+    databaseName: baaki
+    user: baaki
+    plan: free
+    region: oregon
+
 services:
   # Backend API - Spring Boot 3 on Java 21 (Docker)
   - type: web
@@ -6,15 +14,17 @@ services:
     dockerContext: ./backend
     dockerfilePath: ./backend/Dockerfile
     plan: free
+    region: oregon
     healthCheckPath: /api/config
     envVars:
-      # Database connection (e.g. from Aiven, TiDB Cloud, or Railway)
-      - key: SPRING_DATASOURCE_URL
-        sync: false
-      - key: SPRING_DATASOURCE_USERNAME
-        sync: false
-      - key: SPRING_DATASOURCE_PASSWORD
-        sync: false
+      # Activate PostgreSQL profile for Render
+      - key: SPRING_PROFILES_ACTIVE
+        value: postgres
+      # Automatically connects to the free Render PostgreSQL database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: baaki-db
+          property: connectionString
       # Google Gemini API key for scanning paper / PDF invoices
       - key: AI_API_KEY
         sync: false
@@ -43,6 +53,7 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     plan: free
+    region: oregon
     routes:
       # Single-Page Application (SPA) client-side routing
       - type: rewrite

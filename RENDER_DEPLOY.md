@@ -1,50 +1,60 @@
-# Deploying Baaki on Render
+# Deploying Baaki on Render (with Free Managed PostgreSQL)
 
-This guide explains how to deploy **Baaki** (Frontend + Backend) to [Render](https://render.com) using their free tiers.
-
----
-
-## 1. Setup a Free MySQL Database
-
-Render natively provides PostgreSQL, but Baaki uses MySQL. You can use any free MySQL cloud provider:
-
-### Option A: Aiven (Recommended)
-1. Sign up at [Aiven.io](https://aiven.io/).
-2. Create a new service -> select **MySQL** (Free tier available).
-3. Copy the **Service URI** or the host, port, user, and password.
-   - Example JDBC format: `jdbc:mysql://<host>:<port>/defaultdb?sslmode=require`
-
-### Option B: TiDB Cloud (Free Serverless)
-1. Sign up at [TiDB Cloud](https://tidbcloud.com/).
-2. Create a free **Serverless Cluster** (25 GB free storage, 100% MySQL compatible).
-3. In the connection window, select **Java / JDBC** and copy the connection string.
+This guide explains how to deploy **Baaki** (Frontend, Backend, and Database) to [Render](https://render.com) using their **100% Free** tier.
 
 ---
 
-## 2. Deploy Using Render Blueprint (Fastest)
+## Architecture Overview
 
-1. Push your repository to **GitHub** or **GitLab**.
-2. Go to the [Render Dashboard](https://dashboard.render.com/).
-3. Click **New +** -> **Blueprint**.
-4. Connect your Baaki repository.
-5. Render will automatically detect `render.yaml` and configure both services:
-   - `baaki-backend` (Docker Web Service)
-   - `baaki-frontend` (Static Site)
-6. Fill in the environment variables prompted by Render:
-   - `SPRING_DATASOURCE_URL`: Your cloud MySQL JDBC URL
-   - `SPRING_DATASOURCE_USERNAME`: Database username
-   - `SPRING_DATASOURCE_PASSWORD`: Database password
-   - `AI_API_KEY`: Your Gemini API Key
-   - `VITE_API_BASE_URL`: `https://baaki-backend.onrender.com/api` (replace with your actual backend service name)
-7. Click **Apply**.
+- **Database**: Render Managed PostgreSQL (Free)
+- **Backend**: Render Web Service running Spring Boot 3 + Java 21 with `SPRING_PROFILES_ACTIVE=postgres` (Free)
+- **Frontend**: Render Static Site running Vite + React SPA (Free)
+
+*(Note: Local development with `docker-compose` continues to run with MySQL as default, while Render runs with PostgreSQL via the `postgres` Spring profile!)*
 
 ---
 
-## 3. Manual Deployment (Alternative)
+## Method 1: 1-Click Blueprint Deploy (Recommended)
 
-If you prefer to configure services manually without blueprints:
+Render Blueprints automatically creates the PostgreSQL database, backend service, and frontend static site all together.
 
-### Backend (Web Service)
+1. **Push your code to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Add PostgreSQL profile and Render blueprint"
+   git push origin main
+   ```
+
+2. **Open Render**:
+   - Go to [dashboard.render.com](https://dashboard.render.com/).
+   - Click **New +** -> **Blueprint**.
+   - Select your `baaki` repository.
+
+3. **Render will auto-configure**:
+   - Database: `baaki-db` (PostgreSQL)
+   - Backend: `baaki-backend` (Docker container with `postgres` profile)
+   - Frontend: `baaki-frontend` (Static Site with SPA rewrites)
+
+4. **Variables to fill in**:
+   - `AI_API_KEY`: Your Google Gemini API key (for invoice scanning).
+   - `VITE_API_BASE_URL`: `https://baaki-backend.onrender.com/api` (replace with your actual backend name).
+
+5. Click **Apply**! Render will deploy all 3 services automatically.
+
+---
+
+## Method 2: Manual Setup (Step-by-Step)
+
+If you prefer setting up services individually:
+
+### Step 1: Create PostgreSQL Database
+1. In Render, click **New +** -> **PostgreSQL**.
+2. Name: `baaki-db`, Database: `baaki`, User: `baaki`.
+3. Instance Type: **Free**.
+4. Click **Create Database**.
+5. Once created, copy the **Internal Database URL** (e.g., `postgres://baaki:...@dpg-...:5432/baaki`).
+
+### Step 2: Deploy Backend Web Service
 1. Click **New +** -> **Web Service**.
 2. Select your repository.
 3. Configure:
@@ -52,16 +62,15 @@ If you prefer to configure services manually without blueprints:
    - **Root Directory**: `backend`
    - **Runtime**: `Docker`
    - **Instance Type**: `Free`
-4. Environment Variables:
-   - `SPRING_DATASOURCE_URL`: `jdbc:mysql://<host>:<port>/<db>?useSSL=true`
-   - `SPRING_DATASOURCE_USERNAME`: `<username>`
-   - `SPRING_DATASOURCE_PASSWORD`: `<password>`
-   - `AI_API_KEY`: `<your-gemini-key>`
+4. In **Environment Variables**:
+   - `SPRING_PROFILES_ACTIVE`: `postgres`
+   - `DATABASE_URL`: *(paste the Internal Database URL from Step 1)*
+   - `AI_API_KEY`: *(your Gemini key)*
    - `MAIL_PROVIDER`: `none`
-   - `CORS_ALLOWED_ORIGINS`: `https://your-frontend.onrender.com`
-   - `PUBLIC_BASE_URL`: `https://your-frontend.onrender.com`
+   - `CORS_ALLOWED_ORIGINS`: `https://baaki-frontend.onrender.com`
+   - `PUBLIC_BASE_URL`: `https://baaki-frontend.onrender.com`
 
-### Frontend (Static Site)
+### Step 3: Deploy Frontend Static Site
 1. Click **New +** -> **Static Site**.
 2. Select your repository.
 3. Configure:
@@ -73,5 +82,5 @@ If you prefer to configure services manually without blueprints:
    - **Type**: `Rewrite`
    - **Source**: `/*`
    - **Destination**: `/index.html`
-5. Environment Variables:
+5. In **Environment Variables**:
    - `VITE_API_BASE_URL`: `https://baaki-backend.onrender.com/api`
